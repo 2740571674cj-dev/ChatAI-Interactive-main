@@ -1,0 +1,22 @@
+{
+  "servers": [
+    {
+      "name": "free-web-search",
+      "transport": "stdio",
+      "command": "node",
+      "args": ["node_modules/@zhafron/mcp-web-search/dist/src/server.js"],
+      "tool": "search_web",
+      "arguments": {
+        "provider": "duckduckgo",
+        "limit": 8,
+        "lang": "zh-CN"
+      },
+      "env": {
+        "DEFAULT_SEARCH_PROVIDER": "duckduckgo",
+        "MCP_COMPAT_MODE": "legacy",
+        "HTTP_TIMEOUT": "15000"
+      },
+      "timeoutMs": 30000
+    }
+  ]
+}

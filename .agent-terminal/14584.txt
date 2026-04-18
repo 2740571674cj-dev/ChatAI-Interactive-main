@@ -1,0 +1,10 @@
+PID: 14584
+CWD: E:\ChatAI-Interactive-main
+Command: npm.cmd run build -- --config.directories.output=dist-electron-verify-2
+Running: false
+Exit Code: 1
+Last Updated: 2026-04-13T13:34:33.967Z
+--- STDOUT ---
+(empty)
+--- STDERR ---
+(empty)

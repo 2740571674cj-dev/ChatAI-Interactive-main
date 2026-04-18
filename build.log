@@ -1,0 +1,9 @@
+
+> chatai-interactive@1.0.0 build
+> electron-builder --win *; exit 0
+
+  ⨯ type.lastIndexOf is not a function  failedTask=build stackTrace=TypeError: type.lastIndexOf is not a function
+    at processTargets (E:\ChatAI-Interactive-main\node_modules\electron-builder\src\builder.ts:70:30)
+    at normalizeOptions (E:\ChatAI-Interactive-main\node_modules\electron-builder\src\builder.ts:90:5)
+    at build (E:\ChatAI-Interactive-main\node_modules\electron-builder\src\builder.ts:211:24)
+    at E:\ChatAI-Interactive-main\node_modules\electron-builder\src\cli\cli.ts:52:19

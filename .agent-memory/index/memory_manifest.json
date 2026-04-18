@@ -1,0 +1,15 @@
+{
+  "entries": [
+    {
+      "id": "session_mdl_mnvlkg27_sgmjz6",
+      "type": "task_state",
+      "title": "<conversation_history>\n[User] 这个项目的联网搜索能力没有效果，容易乱搜资料产生资料污染\n\n[Assistant] <agent-error>HTTP 429: {\"error\":{\"code\":\"model_cooldown\",\"message\":\"All credentials for model gpt-5.4 are cooling down\",\"model\":\"gpt-5.4\",\"reset_seconds\":474349,\"reset_time\":\"131h45m48s\"}}\nCode: E_HTTP_429</agent-error>\n\n[User] 继续\n\n[Assistant] <skill_used name=\"imagegen\" />\n\n我已继续完成当前能落地的修复：在 `server/routes/chat.js` 增加了两层保护，只有用户消息里有明确“联网搜索/上网查/官方资料”等意图时才触发联网检索；同时新增检索词可靠性校验，拦截过短、偏指令词、含提示词污染特征、以及与原问题词项重合度不足的 query，避免把乱搜结果写入后续上下",
+      "path": "sessions/active/mdl_mnvlkg27_sgmjz6.json",
+      "tags": [
+        "session"
+      ],
+      "updated_at": "2026-04-12T13:12:45.294Z"
+    }
+  ],
+  "lastUpdated": "2026-04-12T13:12:45.294Z"
+}

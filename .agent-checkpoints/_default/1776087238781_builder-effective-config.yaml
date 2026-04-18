@@ -1,0 +1,17 @@
+directories:
+  output: dist-electron-verify-2
+  buildResources: build
+appId: com.chatai.interactive
+productName: ChatAI Interactive
+files:
+  - filter:
+      - electron/**/*
+      - server/**/*
+      - frontend/**/*
+      - package.json
+win:
+  target: nsis
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+electronVersion: 33.4.11

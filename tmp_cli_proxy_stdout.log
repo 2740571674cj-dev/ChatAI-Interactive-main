@@ -1,0 +1,2 @@
+CLIProxyAPI Version: 6.8.55, Commit: db63f9b5, BuiltAt: 2026-03-16T14:33:45Z
+[2026-04-06 23:05:16] [--------] [error] [main.go:391] failed to load config: failed to read config file: open E:\ChatAI: The system cannot find the file specified.

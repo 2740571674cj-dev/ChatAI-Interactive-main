@@ -1,0 +1,14 @@
+appId: com.chatai.interactive
+productName: ChatAI Interactive
+directories:
+  output: dist-electron-verify
+files:
+  - electron/**/*
+  - server/**/*
+  - frontend/**/*
+  - package.json
+win:
+  target: nsis
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true

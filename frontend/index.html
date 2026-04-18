@@ -1,0 +1,2685 @@
+﻿<!DOCTYPE html>
+<!-- saved from url=(0084)file:///E:/TaskForge%E6%B5%8B%E8%AF%95%E9%A1%B9%E7%9B%AE%E9%9B%86/ChatAI/ChatAI.html -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatAI Interactive UI</title>
+    <script src="./ChatAI Interactive UI_files/saved_resource"></script>
+    <!-- Markdown 瑙ｆ瀽寮曟搸涓庤娉曢珮浜?-->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script>
+        if (typeof marked !== 'undefined') {
+            marked.setOptions({
+                highlight: function(code, lang) {
+                    const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                    return hljs.highlight(code, { language }).value;
+                },
+                langPrefix: 'hljs language-',
+                gfm: true,
+                breaks: true
+            });
+        }
+    </script>
+    <style>
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #0d0d0d;
+            color: #ececec;
+        }
+        body, .markdown-body, .message-content, .message-bubble, .message-group {
+            -webkit-user-select: text !important;
+            user-select: text !important;
+        }
+        .sidebar-item:hover { background-color: #212121; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        #sidebar { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar-collapsed { width: 0 !important; opacity: 0; pointer-events: none; }
+        .mode-pill {
+            border: 1px solid transparent;
+            color: #9ca3af;
+            background: transparent;
+            transition: all 0.2s ease;
+        }
+        .mode-pill:hover {
+            color: #f3f4f6;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .mode-pill-active {
+            color: #ffffff;
+            background: linear-gradient(135deg, rgba(255,255,255,0.16), rgba(255,255,255,0.08));
+            border-color: rgba(255, 255, 255, 0.12);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .mode-pill-dot {
+            width: 0.45rem;
+            height: 0.45rem;
+            border-radius: 9999px;
+            background: currentColor;
+            opacity: 0.7;
+        }
+        .mode-switch-shell {
+            width: 100%;
+            max-width: 100%;
+            border-radius: 1rem;
+        }
+        .mode-switch-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.5rem;
+        }
+        .agent-tree-entry {
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .agent-tree-entry:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .agent-tree-entry-active {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+        }
+        .agent-tree-toggle {
+            width: 1rem;
+            height: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+        }
+        .agent-tree-children {
+            margin-top: 0.125rem;
+        }
+        .agent-project-picker {
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.025);
+            transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+        }
+        .agent-project-picker:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.045);
+        }
+        .agent-project-card {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015)),
+                rgba(255, 255, 255, 0.02);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+        }
+        .agent-project-actions {
+            opacity: 0.78;
+            transition: opacity 0.2s ease;
+        }
+        .agent-project-card:hover .agent-project-actions {
+            opacity: 1;
+        }
+        .agent-project-icon-btn {
+            width: 1.9rem;
+            height: 1.9rem;
+            border: 1px solid transparent;
+            border-radius: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #8b95a7;
+            background: transparent;
+            transition: all 0.2s ease;
+        }
+        .agent-project-icon-btn:hover {
+            color: #f3f4f6;
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+        .agent-project-status-dot {
+            width: 0.42rem;
+            height: 0.42rem;
+            border-radius: 9999px;
+            background: #34d399;
+            box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.08);
+            flex: 0 0 auto;
+        }
+        .sidebar-scroll-shell {
+            min-height: 0;
+        }
+        
+        /* 鎮诞鏄剧ず鎿嶄綔鎸夐挳 */
+        .action-btn { opacity: 0; transition: opacity 0.2s; }
+        .group:hover .action-btn { opacity: 1; }
+        
+        /* 寮圭獥鍔ㄧ敾 */
+        .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); }
+        .modal-content { animation: modalScale 0.25s ease-out; }
+        @keyframes modalScale {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .typing::after { content: '|'; animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* AI 澶村儚鍛煎惛鍔ㄧ敾锛堟鍦ㄧ敓鎴愮姸鎬侊級 */
+        @keyframes avatarBreathe {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(0.85); opacity: 0.6; }
+        }
+        .avatar-loading {
+            animation: avatarBreathe 1s infinite ease-in-out;
+        }
+
+        /* 淇鍚庣殑 Toggle 寮€鍏虫牱寮?*/
+        .toggle-checkbox { display: none; }
+        .toggle-label {
+            width: 2.75rem;
+            height: 1.5rem;
+            background-color: #3f3f46;
+            border-radius: 9999px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .toggle-label::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 1.25rem;
+            height: 1.25rem;
+            background-color: #a1a1aa;
+            border-radius: 50%;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #10b981; /* 寮€鍚姸鎬佺豢鑹?*/
+        }
+        .toggle-checkbox:checked + .toggle-label::after {
+            transform: translateX(1.25rem);
+            background-color: white; /* 寮€鍚姸鎬佺櫧鑹叉粦鍧?*/
+        }
+
+        /* Markdown 娓叉煋绮剧粏鍖栨牱寮?*/
+        .markdown-body {
+            font-size: 1rem;
+            line-height: 1.5;
+            word-wrap: break-word;
+            max-width: 100%;
+        }
+        .markdown-body > *:first-child { margin-top: 0 !important; }
+        .markdown-body > *:last-child { margin-bottom: 0 !important; }
+        .markdown-body p { margin-bottom: 0.75em; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+            margin-top: 20px; margin-bottom: 12px; font-weight: 600; line-height: 1.25; color: #f4f4f5;
+        }
+        .markdown-body h1 { font-size: 1.5em; padding-bottom: 0.3em; border-bottom: 1px solid #3f3f46; }
+        .markdown-body h2 { font-size: 1.25em; padding-bottom: 0.3em; border-bottom: 1px solid #3f3f46; }
+        .markdown-body h3 { font-size: 1.125em; }
+        /* 浣跨敤涓撻棬鐨勫己璋冭壊娓叉煋绮椾綋锛屾弧瓒崇敤鎴峰尯鍒嗛噸鐐圭殑瑕佹眰 */
+        .markdown-body strong, .markdown-body b { color: #fbbf24; font-weight: 600; } 
+        .markdown-body em, .markdown-body i { font-style: italic; color: #d4d4d8; }
+        .markdown-body ul, .markdown-body ol { padding-left: 2em; margin-bottom: 0.75em; }
+        .markdown-body ul { list-style-type: disc; }
+        .markdown-body ol { list-style-type: decimal; }
+        .markdown-body li + li { margin-top: 0.15em; }
+        .markdown-body blockquote {
+            padding: 0 1em; color: #a1a1aa; border-left: 0.25em solid #52525b; margin: 0 0 0.75em 0; background: #18181b; padding-block: 0.5em; border-radius: 0 4px 4px 0;
+        }
+        .markdown-body code {
+            padding: 0.2em 0.4em; margin: 0; font-size: 85%; background-color: rgba(255, 255, 255, 0.1); border-radius: 6px; font-family: ui-monospace, monospace; color: #f472b6;
+        }
+        .markdown-body pre {
+            padding: 16px; overflow: auto; font-size: 85%; line-height: 1.45; background-color: #0d0d0d; border: 1px solid #27272a; border-radius: 6px; margin-bottom: 1em;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        .markdown-body pre code {
+            padding: 0; margin: 0; font-size: 100%; background-color: transparent; border-radius: 0; color: inherit;
+        }
+        .markdown-body table {
+            border-spacing: 0; border-collapse: collapse; width: max-content; max-width: 100%; margin-bottom: 1em; overflow: auto; display: block;
+        }
+        .markdown-body table th, .markdown-body table td {
+            padding: 6px 13px; border: 1px solid #3f3f46;
+        }
+        .markdown-body table th { font-weight: 600; background-color: #27272a; color: #e4e4e7; }
+        .markdown-body table tr { background-color: transparent; border-top: 1px solid #3f3f46; }
+        .markdown-body table tr:nth-child(2n) { background-color: #18181b; }
+        .markdown-body a { color: #60a5fa; text-decoration: none; }
+        .markdown-body a:hover { text-decoration: underline; }
+        .code-block-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0.65rem 0.85rem;
+            border-bottom: 1px solid #27272a;
+            background: #111827;
+        }
+        .code-block-toolbar-inline {
+            margin-top: -0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #27272a;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            background: #111827;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        .code-block-meta {
+            font-size: 0.75rem;
+            line-height: 1rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #9ca3af;
+        }
+        .code-block-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .code-tool-btn {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 9999px;
+            padding: 0.3rem 0.75rem;
+            font-size: 0.75rem;
+            line-height: 1rem;
+            color: #e5e7eb;
+            background: rgba(255, 255, 255, 0.04);
+            transition: background-color 0.2s, border-color 0.2s, opacity 0.2s;
+        }
+        .code-tool-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.16);
+        }
+        .code-tool-btn:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+        .code-tool-btn--run {
+            background: rgba(16, 185, 129, 0.14);
+            border-color: rgba(16, 185, 129, 0.24);
+            color: #a7f3d0;
+        }
+        .code-tool-btn--run:hover {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        .markdown-body pre.has-code-toolbar {
+            margin-bottom: 0;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0px}.bottom-full{bottom:100%}.left-0{left:0px}.left-3{left:0.75rem}.top-full{top:100%}.z-50{z-index:50}.z-\[100\]{z-index:100}.z-\[110\]{z-index:110}.z-\[120\]{z-index:120}.z-\[130\]{z-index:130}.mx-1{margin-left:0.25rem;margin-right:0.25rem}.mx-auto{margin-left:auto;margin-right:auto}.my-1{margin-top:0.25rem;margin-bottom:0.25rem}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.mr-1{margin-right:0.25rem}.mt-1{margin-top:0.25rem}.mt-4{margin-top:1rem}.mt-auto{margin-top:auto}.mt-0\.5{margin-top:0.125rem}.line-clamp-3{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-1\.5{height:0.375rem}.h-24{height:6rem}.h-8{height:2rem}.h-\[600px\]{height:600px}.h-\[75vh\]{height:75vh}.h-full{height:100%}.h-px{height:1px}.h-screen{height:100vh}.h-16{height:4rem}.h-2\.5{height:0.625rem}.max-h-\[70vh\]{max-height:70vh}.w-1\.5{width:0.375rem}.w-40{width:10rem}.w-48{width:12rem}.w-56{width:14rem}.w-64{width:16rem}.w-8{width:2rem}.w-\[400px\]{width:400px}.w-\[450px\]{width:450px}.w-\[700px\]{width:700px}.w-full{width:100%}.w-2\.5{width:0.625rem}.min-w-0{min-width:0px}.max-w-2xl{max-width:42rem}.max-w-3xl{max-width:48rem}.max-w-\[90\%\]{max-width:90%}.max-w-\[95\%\]{max-width:95%}.max-w-\[200px\]{max-width:200px}.flex-1{flex:1 1 0%}.shrink-0{flex-shrink:0}.cursor-pointer{cursor:pointer}.cursor-default{cursor:default}.resize-none{resize:none}.list-disc{list-style-type:disc}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1{gap:0.25rem}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.space-y-0\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.125rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.125rem * var(--tw-space-y-reverse))}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.space-y-8 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(2rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(2rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rounded{border-radius:0.25rem}.rounded-2xl{border-radius:1rem}.rounded-3xl{border-radius:1.5rem}.rounded-\[26px\]{border-radius:26px}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-r{border-right-width:1px}.border-t{border-top-width:1px}.border-none{border-style:none}.border-transparent{border-color:transparent}.border-white\/10{border-color:rgb(255 255 255 / 0.1)}.border-white\/5{border-color:rgb(255 255 255 / 0.05)}.border-white\/40{border-color:rgb(255 255 255 / 0.4)}.bg-\[\#0d0d0d\]{--tw-bg-opacity:1;background-color:rgb(13 13 13 / var(--tw-bg-opacity, 1))}.bg-\[\#171717\]{--tw-bg-opacity:1;background-color:rgb(23 23 23 / var(--tw-bg-opacity, 1))}.bg-\[\#212121\]{--tw-bg-opacity:1;background-color:rgb(33 33 33 / var(--tw-bg-opacity, 1))}.bg-\[\#2f2f2f\]{--tw-bg-opacity:1;background-color:rgb(47 47 47 / var(--tw-bg-opacity, 1))}.bg-black\/60{background-color:rgb(0 0 0 / 0.6)}.bg-blue-500{--tw-bg-opacity:1;background-color:rgb(59 130 246 / var(--tw-bg-opacity, 1))}.bg-emerald-500{--tw-bg-opacity:1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.bg-orange-500{--tw-bg-opacity:1;background-color:rgb(249 115 22 / var(--tw-bg-opacity, 1))}.bg-purple-500{--tw-bg-opacity:1;background-color:rgb(168 85 247 / var(--tw-bg-opacity, 1))}.bg-red-600{--tw-bg-opacity:1;background-color:rgb(220 38 38 / var(--tw-bg-opacity, 1))}.bg-transparent{background-color:transparent}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-white\/10{background-color:rgb(255 255 255 / 0.1)}.bg-white\/5{background-color:rgb(255 255 255 / 0.05)}.bg-\[\#10b981\]{--tw-bg-opacity:1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.bg-gray-600{--tw-bg-opacity:1;background-color:rgb(75 85 99 / var(--tw-bg-opacity, 1))}.bg-gradient-to-tr{background-image:linear-gradient(to top right, var(--tw-gradient-stops))}.from-orange-400{--tw-gradient-from:#fb923c var(--tw-gradient-from-position);--tw-gradient-to:rgb(251 146 60 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-rose-400{--tw-gradient-to:#fb7185 var(--tw-gradient-to-position)}.p-1{padding:0.25rem}.p-1\.5{padding:0.375rem}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.px-1{padding-left:0.25rem;padding-right:0.25rem}.px-1\.5{padding-left:0.375rem;padding-right:0.375rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-8{padding-top:2rem;padding-bottom:2rem}.pb-6{padding-bottom:1.5rem}.pl-4{padding-left:1rem}.pl-6{padding-left:1.5rem}.pr-2{padding-right:0.5rem}.pt-5{padding-top:1.25rem}.text-left{text-align:left}.text-center{text-align:center}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-\[11px\]{font-size:11px}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.text-\[10px\]{font-size:10px}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.italic{font-style:italic}.leading-relaxed{line-height:1.625}.tracking-tight{letter-spacing:-0.025em}.tracking-wider{letter-spacing:0.05em}.tracking-widest{letter-spacing:0.1em}.text-black{--tw-text-opacity:1;color:rgb(0 0 0 / var(--tw-text-opacity, 1))}.text-gray-200{--tw-text-opacity:1;color:rgb(229 231 235 / var(--tw-text-opacity, 1))}.text-gray-300{--tw-text-opacity:1;color:rgb(209 213 219 / var(--tw-text-opacity, 1))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.placeholder-gray-500::placeholder{--tw-placeholder-opacity:1;color:rgb(107 114 128 / var(--tw-placeholder-opacity, 1))}.placeholder-gray-600::placeholder{--tw-placeholder-opacity:1;color:rgb(75 85 99 / var(--tw-placeholder-opacity, 1))}.opacity-0{opacity:0}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-opacity{transition-property:opacity;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-transform{transition-property:transform;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-200{transition-duration:200ms}.marker\:text-gray-600 *::marker{color:rgb(75 85 99 )}.marker\:text-gray-600::marker{color:rgb(75 85 99 )}.focus-within\:border-white\/10:focus-within{border-color:rgb(255 255 255 / 0.1)}.hover\:bg-gray-200:hover{--tw-bg-opacity:1;background-color:rgb(229 231 235 / var(--tw-bg-opacity, 1))}.hover\:bg-red-700:hover{--tw-bg-opacity:1;background-color:rgb(185 28 28 / var(--tw-bg-opacity, 1))}.hover\:bg-white\/10:hover{background-color:rgb(255 255 255 / 0.1)}.hover\:bg-white\/5:hover{background-color:rgb(255 255 255 / 0.05)}.hover\:text-gray-300:hover{--tw-text-opacity:1;color:rgb(209 213 219 / var(--tw-text-opacity, 1))}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.hover\:text-red-400:hover{--tw-text-opacity:1;color:rgb(248 113 113 / var(--tw-text-opacity, 1))}.focus\:border-white\/20:focus{border-color:rgb(255 255 255 / 0.2)}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.disabled\:opacity-20:disabled{opacity:0.2}.group:hover .group-hover\:opacity-100{opacity:1}</style></head>
+<body class="flex h-screen overflow-hidden" onclick="closeAllMenus()">
+
+    <!-- 渚ц竟鏍?-->
+    <aside id="sidebar" class="w-60 bg-[#171717] flex flex-col border-r border-white/5 shrink-0 relative">
+        <div class="p-3 space-y-1">
+            <div class="flex items-center px-2 py-2 mb-2">
+                <button onclick="toggleSidebar()" class="p-1 hover:bg-white/10 rounded-md cursor-pointer text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path></svg>
+                </button>
+            </div>
+            <nav class="space-y-0.5 flex flex-col">
+                <button onclick="resetChat()" class="sidebar-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-white font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5v14"></path></svg>
+                    <span>新聊天</span>
+                </button>
+                <div class="px-1 py-1" style="order:-1;">
+                    <div class="mode-switch-shell rounded-2xl border border-white/10 bg-white/[0.03] px-1.5 py-1">
+                        <div class="mb-0.5 px-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-500">Mode</div>
+                        <div class="mode-switch-grid">
+                            <button id="sidebar-ask-mode-btn" type="button" onclick="toggleChatMode('ask', event)" class="mode-pill mode-pill-active flex items-center justify-center gap-1.5 rounded-xl px-2.5 py-1.5 text-sm font-medium leading-none">
+                                <span class="mode-pill-dot"></span>
+                                <span>Ask</span>
+                            </button>
+                            <button id="sidebar-agent-mode-btn" type="button" onclick="toggleChatMode('agent', event)" class="mode-pill flex items-center justify-center gap-1.5 rounded-xl px-2.5 py-1.5 text-sm font-medium leading-none">
+                                <span class="mode-pill-dot"></span>
+                                <span>Agent</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-1 py-1">
+                    <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/5 border border-transparent focus-within:border-white/10 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+                        <input type="text" id="history-search" placeholder="搜索" class="bg-transparent border-none focus:outline-none text-sm text-gray-300 w-full placeholder-gray-500" oninput="handleHistorySearch(this.value)">
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="flex-1 overflow-y-auto px-3 mt-4 scrollbar-hide sidebar-scroll-shell" id="history-list">
+            <div id="agent-project-panel" class="hidden mb-4 space-y-3 px-1">
+                <button onclick="selectAgentProject()" class="agent-project-picker flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition-colors">
+                    <span class="flex items-center gap-2 min-w-0">
+                        <span class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-white/[0.04] text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H10l2 2h6.5A2.5 2.5 0 0 1 21 9.5v9A2.5 2.5 0 0 1 18.5 21h-13A2.5 2.5 0 0 1 3 18.5z"></path></svg>
+                        </span>
+                        <span class="min-w-0">
+                            <span class="block text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-500">项目目录</span>
+                            <span class="block truncate text-sm text-gray-200">选择项目文件夹</span>
+                        </span>
+                    </span>
+                    <span class="text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg>
+                    </span>
+                </button>
+                <div id="agent-project-summary" class="agent-project-card hidden rounded-2xl p-3">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0 flex-1">
+                            <div class="truncate text-[15px] font-semibold tracking-[-0.01em] text-white" id="agent-project-name"></div>
+                            <div id="agent-project-path" class="mt-1 truncate text-[11px] text-gray-500"></div>
+                            <div class="mt-3 flex items-center gap-2 min-w-0">
+                                <span class="agent-project-status-dot"></span>
+                                <div id="agent-project-focus" class="min-w-0 truncate text-[11px] text-gray-400"></div>
+                            </div>
+                        </div>
+                        <div class="agent-project-actions flex items-center gap-1">
+                            <button type="button" onclick="refreshAgentProject()" class="agent-project-icon-btn" title="刷新项目" aria-label="刷新项目">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+                            </button>
+                            <button type="button" onclick="clearAgentProject()" class="agent-project-icon-btn" title="清除项目" aria-label="清除项目">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4.8c0-.99.81-1.8 1.8-1.8h4.4c.99 0 1.8.81 1.8 1.8V6"></path><path d="M19 6l-1 13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <p id="agent-project-empty" class="px-1 text-[11px] leading-relaxed text-gray-500">选择一个真实项目文件夹后，Agent 会在这里展示当前项目概览与文件树。</p>
+            </div>
+            <h3 id="sidebar-section-title" class="px-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2">最近对话</h3>
+            <div class="space-y-0.5" id="history-items"></div>
+        </div>
+        <div class="p-3 relative">
+            <div id="profile-menu" class="absolute bottom-full left-3 mb-2 w-56 bg-[#212121] rounded-2xl p-1.5 shadow-2xl border border-white/10 z-50 modal-content hidden">
+                <button onclick="openSettings()" class="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 rounded-lg text-sm text-gray-300 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    <span>设置</span>
+                </button>
+                <div class="h-px bg-white/5 my-1"></div>
+                <button onclick="openHelpModal()" class="w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/5 rounded-lg text-sm text-gray-300 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                        <span>帮助</span>
+                    </div>
+                </button>
+                <button class="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 rounded-lg text-sm text-gray-300 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" x2="9" y1="12" y2="12"></line></svg>
+                    <span>退出登录</span>
+                </button>
+            </div>
+            <div onclick="toggleProfileMenu(event)" class="flex items-center gap-3 p-2 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-400 to-rose-400 flex items-center justify-center text-xs text-white font-bold">陈</div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium truncate">陈晓军</p>
+                    <p class="text-[11px] text-gray-500">ChatGPT Plus</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 涓诲唴瀹瑰尯 -->
+    <main class="flex-1 flex flex-col relative bg-[#0d0d0d] overflow-hidden">
+        <header class="flex items-center justify-between px-3 py-3 shrink-0">
+            <div class="flex items-center">
+                <!-- 灏嗗睍寮€渚ц竟鏍忔寜閽Щ鍏?header 涓紝渚濋潬 Flexbox 鑷姩鎺掔増锛岄伩鍏嶇粷瀵瑰畾浣嶉噸鍙?-->
+                <button id="sidebar-open-btn" onclick="toggleSidebar()" class="p-2 mr-1 hover:bg-white/5 rounded-lg text-gray-400 transition-colors hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path></svg>
+                </button>
+                
+                <!-- 鏂板鐨勬ā鍨嬮€夋嫨涓嬫媺鍖呰鍣?-->
+                <div class="relative">
+                    <div onclick="toggleModelMenu(event)" class="flex items-center gap-1 px-3 py-1.5 hover:bg-white/5 rounded-lg cursor-pointer transition-colors text-gray-300 font-medium">
+                        <span id="current-model-display">ChatGPT 4o</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+                    </div>
+
+                    <!-- 妯″瀷涓嬫媺鑿滃崟 -->
+                    <div id="model-menu" class="absolute top-full left-0 mt-1 w-48 bg-[#212121] rounded-2xl p-1.5 shadow-2xl border border-white/10 z-50 modal-content hidden"><button class="w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/5 rounded-lg text-sm text-gray-300 transition-colors">
+                    <span class="truncate">ChatGPT 4o</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+                </button><div class="px-3 py-2 text-xs text-gray-500 text-center mt-1 border-t border-white/5 cursor-default">暂无更多模型</div></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto scrollbar-hide flex flex-col items-center" id="scroll-container">
+            <div id="welcome-view" class="flex-1 flex flex-col items-center justify-center w-full max-w-3xl px-4">
+                <h1 class="text-4xl font-semibold tracking-tight text-white mb-8">现在可以帮你做什么？</h1>
+                <div class="grid grid-cols-2 gap-3 w-full max-w-2xl">
+                    <button onclick="quickMessage(&#39;帮我写一份工作总结周报&#39;)" class="text-left p-4 border border-white/10 rounded-2xl hover:bg-white/5 transition-colors text-sm text-gray-300">
+                        <p class="font-medium mb-1">写个总结</p><p class="text-gray-500 text-xs">帮我写一份工作总结周报</p>
+                    </button>
+                    <button onclick="quickMessage(&#39;有哪些有趣的科学冷知识？&#39;)" class="text-left p-4 border border-white/10 rounded-2xl hover:bg-white/5 transition-colors text-sm text-gray-300">
+                        <p class="font-medium mb-1">趣味科普</p><p class="text-gray-500 text-xs">有哪些有趣的科学冷知识？</p>
+                    </button>
+                </div>
+            </div>
+            <div id="messages-list" class="hidden w-full max-w-3xl px-4 py-8 space-y-8"></div>
+        </div>
+
+        <div class="max-w-3xl w-full mx-auto px-4 pb-6 flex flex-col gap-3 shrink-0">
+            
+            <!-- 鏂板锛氭彁绀鸿瘝鐘舵€佸揩鎹锋帶鍒舵爮 -->
+            <div id="composer-toolbar" class="flex items-center gap-2 overflow-x-auto px-1 scrollbar-hide">
+                <div id="prompt-status-bar" class="flex shrink-0 items-center gap-2">
+                    <button type="button" onclick="openPromptSelectModal(&#39;global&#39;, event)" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer bg-[#2f2f2f] text-gray-200 border border-white/10 shadow-sm">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span>
+                        全局提示词
+                    </button>
+                    <button type="button" onclick="openPromptSelectModal(&#39;specific&#39;, event)" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer bg-transparent text-gray-500 hover:bg-white/5 border border-transparent">
+                        <span class="w-1.5 h-1.5 rounded-full bg-gray-600"></span>
+                        当前提示词
+                    </button>
+                </div>
+                <div id="web-search-status-bar" class="flex shrink-0 items-center gap-2">
+                    <button type="button" id="web-search-toggle" onclick="toggleWebSearch(event)" aria-pressed="false" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer bg-transparent text-gray-500 hover:bg-white/5 border border-transparent">
+                        <span id="web-search-dot" class="w-1.5 h-1.5 rounded-full bg-gray-600"></span>
+                        <span id="web-search-label">联网搜索</span>
+                    </button>
+                    <span id="web-search-status" class="hidden text-xs text-gray-500 truncate" style="max-width: 540px;"></span>
+                </div>
+            </div>
+
+            <div class="relative bg-[#2f2f2f] rounded-[26px] p-2 flex flex-col border border-transparent focus-within:border-white/10 transition-all">
+                <div class="flex items-center gap-2 px-2">
+                    <!-- 鏂板鐨勯檮浠跺脊鍑鸿彍鍗曞寘瑁呭鍣?-->
+                    <div class="relative">
+                        <button onclick="toggleAttachMenu(event)" class="p-2 text-gray-400 hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+                        </button>
+                        
+                        <!-- 闄勪欢鑿滃崟闈㈡澘 -->
+                        <div id="attach-menu" class="hidden absolute bottom-full left-0 mb-2 w-44 bg-[#212121] rounded-2xl p-1.5 shadow-2xl border border-white/10 z-50 modal-content">
+                            <button onclick="openDocumentPicker(event)" class="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 rounded-lg text-sm text-gray-300 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                <span>上传文件</span>
+                            </button>
+                            <button onclick="openImagePicker(event)" class="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 rounded-lg text-sm text-gray-300 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
+                                <span>上传图片</span>
+                            </button>
+                            <!-- 鏂板 GitHub 瀵煎叆閫夐」 -->
+                            <div class="h-px bg-white/5 my-1"></div>
+                            <button onclick="openGithubModal()" class="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 rounded-lg text-sm text-gray-300 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.24c3-.3 6-1.5 6-6.76a5.2 5.2 0 0 0-1.4-3.6 4.9 4.9 0 0 0-.1-3.5s-1.1-.4-3.5 1.3a11.5 11.5 0 0 0-6 0C5.1 3.5 4 3.9 4 3.9a4.9 4.9 0 0 0-.1 3.5A5.2 5.2 0 0 0 2.5 11c0 5.2 3 6.4 6 6.76a4.8 4.8 0 0 0-1 3.24v4"></path><path d="M9 18c-4.5 1-5-2.5-5-2.5"></path></svg>
+                                <span>导入 GitHub</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <textarea id="user-input" rows="1" placeholder="说说你的需求，我来帮你处理" class="flex-1 w-full min-w-0 bg-transparent border-none focus:outline-none text-white placeholder-gray-500 py-3 text-base resize-none" oninput="this.style.height = &#39;&#39;; this.style.height = this.scrollHeight + &#39;px&#39;"></textarea>
+                    <button id="send-btn" onclick="handleSend()" class="p-2 bg-white rounded-full text-black hover:bg-gray-200 transition-opacity disabled:opacity-20" disabled="">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+            <div id="pending-attachments" class="hidden flex flex-wrap gap-2 px-2 pb-2 pt-1"></div>
+            <input id="attach-file-input" type="file" multiple class="hidden">
+            <input id="attach-image-input" type="file" accept="image/*" multiple class="hidden">
+            <p class="text-[11px] text-center text-gray-500">ChatAI 也可能出错，请注意核对重要信息。</p>
+        </div>
+    </main>
+
+    <!-- 璁剧疆寮圭獥 -->
+    <div id="settings-modal" class="fixed inset-0 z-[100] flex items-center justify-center hidden">
+        <div class="absolute inset-0 modal-overlay" onclick="closeSettings()"></div>
+        <div class="relative bg-[#171717] w-[700px] max-w-[95%] h-[600px] rounded-3xl overflow-hidden shadow-2xl border border-white/10 flex flex-col modal-content">
+            <!-- 澶撮儴 -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-white/5">
+                <h2 class="text-lg font-semibold text-white">设置</h2>
+                <button onclick="closeSettings()" class="text-gray-500 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <!-- 鍐呭瀹瑰櫒 -->
+            <div class="flex flex-1 overflow-hidden">
+                <!-- 宸︿晶 Tab -->
+                <div class="w-48 bg-[#0d0d0d] p-3 space-y-1 shrink-0">
+                    <button onclick="switchTab(&#39;personal&#39;)" id="tab-personal-btn" class="w-full text-left px-3 py-2 rounded-lg text-sm transition-colors bg-white/10 text-white">提示词</button>
+                    <button onclick="switchTab(&#39;api&#39;)" id="tab-api-btn" class="w-full text-left px-3 py-2 rounded-lg text-sm transition-colors text-gray-400 hover:text-white">API 设置</button>
+                    <button onclick="switchTab(&#39;storage&#39;)" id="tab-storage-btn" class="w-full text-left px-3 py-2 rounded-lg text-sm transition-colors text-gray-400 hover:text-white">存储设置</button>
+                </div>
+                <!-- 鍙充晶鍐呭 -->
+                <div class="flex-1 flex flex-col p-6 overflow-y-auto scrollbar-hide">
+                    
+                    <!-- 涓€у寲鎻愮ず璇嶉€夐」 -->
+                    <div id="tab-personal" class="flex flex-col h-full">
+                        <!-- 瀛愰€夐」鍗″垏鎹㈤潰鏉?-->
+                        <div class="flex p-1 bg-[#0d0d0d] rounded-xl mb-6 border border-white/5 shrink-0">
+                            <button onclick="switchPromptSubTab(&#39;global&#39;)" id="subtab-global-btn" class="flex-1 py-1.5 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-300 transition-all">全局提示词</button>
+                            <button onclick="switchPromptSubTab(&#39;specific&#39;)" id="subtab-specific-btn" class="flex-1 py-1.5 text-sm font-medium rounded-lg bg-[#2f2f2f] text-white shadow-sm transition-all">当前提示词</button>
+                        </div>
+
+                        <!-- 鍏ㄥ眬鎻愮ず璇嶆澘鍧?-->
+                        <div id="prompt-section-global" class="flex-1 overflow-y-auto scrollbar-hide pr-2 hidden">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="text-sm font-medium text-white">全局提示词</h3>
+                                    <p class="text-xs text-gray-500">会在所有对话中默认生效。</p>
+                                </div>
+                                <button onclick="addPrompt(&#39;global&#39;)" class="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs transition-colors flex items-center gap-1.5 text-gray-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+                                    添加一个
+                                </button>
+                            </div>
+                            <div id="global-prompts-list" class="space-y-4"><div class="bg-[#0d0d0d] border border-white/10 rounded-2xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] uppercase font-bold text-gray-600 tracking-widest">Global Item</span>
+                        <div class="flex items-center gap-3">
+                            <button onclick="removePrompt(&#39;global&#39;, &#39;g1&#39;)" class="p-1 text-gray-500 hover:text-red-400 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                            </button>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="check-g1" class="toggle-checkbox" checked="" onchange="togglePrompt(&#39;global&#39;, &#39;g1&#39;, this.checked)">
+                                <label for="check-g1" class="toggle-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea class="w-full bg-transparent border-none focus:outline-none text-sm text-gray-300 placeholder-gray-600 resize-none h-16" placeholder="例如：请始终使用专业、客观、简洁的语气回复。" oninput="updatePromptText(&#39;global&#39;, &#39;g1&#39;, this.value)"></textarea>
+                </div></div>
+                        </div>
+
+                        <!-- 鐗瑰畾鎻愮ず璇嶆澘鍧?-->
+                        <div id="prompt-section-specific" class="flex-1 overflow-y-auto scrollbar-hide pr-2">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="text-sm font-medium text-white">当前提示词</h3>
+                                    <p class="text-xs text-gray-500">只对当前这段对话生效。</p>
+                                </div>
+                                <button onclick="addPrompt(&#39;specific&#39;)" class="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs transition-colors flex items-center gap-1.5 text-gray-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+                                    添加一个
+                                </button>
+                            </div>
+                            <div id="specific-prompts-list" class="space-y-4"><div class="bg-[#0d0d0d] border border-white/10 rounded-2xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] uppercase font-bold text-gray-600 tracking-widest">Current Item</span>
+                        <div class="flex items-center gap-3">
+                            <button onclick="removePrompt(&#39;specific&#39;, &#39;s1&#39;)" class="p-1 text-gray-500 hover:text-red-400 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                            </button>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="check-s1" class="toggle-checkbox" onchange="togglePrompt(&#39;specific&#39;, &#39;s1&#39;, this.checked)">
+                                <label for="check-s1" class="toggle-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea class="w-full bg-transparent border-none focus:outline-none text-sm text-gray-300 placeholder-gray-600 resize-none h-16" placeholder="针对这个任务的特殊要求，例如输出格式、语气或限制条件。" oninput="updatePromptText(&#39;specific&#39;, &#39;s1&#39;, this.value)"></textarea>
+                </div></div>
+                        </div>
+                    </div>
+
+                    <!-- API 璁剧疆閫夐」: 鏍硅鍥?-->
+                    <div id="tab-api" class="hidden flex flex-col h-full">
+                        
+                        <!-- 瑙嗗浘1: 宸蹭繚瀛樻ā鍨嬪垪琛?-->
+                        <div id="api-list-view" class="flex flex-col h-full">
+                            <div class="flex justify-between items-center mb-4">
+                                <div>
+                                    <h3 class="text-sm font-medium text-white">已保存的模型</h3>
+                                    <p class="text-xs text-gray-500 mt-1">在这里切换当前使用的对话模型。</p>
+                                </div>
+                                <button onclick="showApiEditView()" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs transition-colors flex items-center gap-1.5 text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+                                    添加模型
+                                </button>
+                            </div>
+                            <div id="api-models-container" class="space-y-3 flex-1 overflow-y-auto pr-2 scrollbar-hide"><div class="flex items-center justify-between p-4 bg-[#0d0d0d] border border-white/40 rounded-2xl group transition-all">
+                    <div class="flex items-center gap-4 flex-1 min-w-0 cursor-pointer" onclick="setActiveModel(&#39;m1&#39;)">
+                        <div class="w-2.5 h-2.5 rounded-full bg-white transition-colors shrink-0"></div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-medium text-white truncate">ChatGPT 4o</p>
+                            <p class="text-[11px] text-gray-500 mt-0.5 truncate max-w-[200px]">https://api.openai.com</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="showApiEditView(&#39;m1&#39;)" class="p-1.5 text-gray-400 hover:text-white rounded-lg bg-white/5 hover:bg-white/10 transition-colors" title="编辑">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path><path d="m15 5 4 4"></path></svg>
+                        </button>
+                        <button onclick="deleteApiModel(&#39;m1&#39;)" class="p-1.5 text-gray-400 hover:text-red-400 rounded-lg bg-white/5 hover:bg-white/10 transition-colors" title="删除">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                        </button>
+                    </div>
+                </div></div>
+                        </div>
+
+                        <!-- 瑙嗗浘2: 妯″瀷缂栬緫/娣诲姞琛ㄥ崟 -->
+                        <div id="api-edit-view" class="hidden flex flex-col h-full">
+                            <div class="flex items-center gap-3 mb-6">
+                                <button onclick="showApiListView()" class="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
+                                </button>
+                                <h3 class="text-sm font-medium text-white" id="api-edit-title">添加新模型</h3>
+                            </div>
+
+                            <div class="flex-1 overflow-y-auto scrollbar-hide pr-2 space-y-6">
+                                <!-- 鎶樺彔闈㈡澘: 鑷姩瑙ｆ瀽 -->
+                                <div class="border border-white/10 rounded-xl overflow-hidden">
+                                    <button onclick="toggleApiParser()" class="w-full flex items-center justify-between p-3 bg-[#171717] hover:bg-white/5 transition-colors text-sm text-gray-300">
+                                        <div class="flex items-center gap-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500"><path d="m18 16 4-4-4-4"></path><path d="m6 8-4 4 4 4"></path><path d="m14.5 4-5 16"></path></svg>
+                                            <span>自动解析配置（支持 curl / Python）</span>
+                                        </div>
+                                        <svg id="parser-chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500 transition-transform duration-200"><path d="m6 9 6 6 6-6"></path></svg>
+                                    </button>
+                                    <div id="api-parser-container" class="hidden p-3 border-t border-white/10 bg-[#0d0d0d] space-y-3">
+                                        <textarea id="api-parser-input" placeholder="粘贴完整的 curl 或 Python 请求代码..." class="w-full bg-[#171717] border border-white/5 rounded-lg p-3 text-xs text-gray-400 font-mono h-24 resize-none focus:outline-none focus:border-white/20"></textarea>
+                                        <button onclick="parseAPICode()" class="w-full py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm font-medium border border-white/5 transition-colors text-gray-300">开始解析</button>
+                                    </div>
+                                </div>
+
+                                <!-- 鎵嬪姩琛ㄥ崟 -->
+                                <div class="space-y-4">
+                                    <div class="space-y-2">
+                                        <label class="text-xs text-gray-500 px-1">模型名称</label>
+                                        <input type="text" id="api-model" placeholder="例如：ChatGPT 4o" class="w-full bg-[#0d0d0d] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-gray-300 focus:outline-none focus:border-white/20 transition-colors">
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-xs text-gray-500 px-1">API 地址（Base URL）</label>
+                                        <input type="text" id="api-url" placeholder="例如：https://api.openai.com" class="w-full bg-[#0d0d0d] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-gray-300 focus:outline-none focus:border-white/20 transition-colors">
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-xs text-gray-500 px-1">API Key</label>
+                                        <input type="password" id="api-key" placeholder="sk-..." class="w-full bg-[#0d0d0d] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-gray-300 focus:outline-none focus:border-white/20 transition-colors">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3 pt-5 mt-auto border-t border-white/5 shrink-0">
+                                <button onclick="testConnection()" id="test-btn" class="flex-1 py-2.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl text-sm transition-colors text-gray-300">测试连接</button>
+                                <button onclick="saveApiModel()" class="flex-1 py-2.5 bg-white text-black font-semibold rounded-xl text-sm hover:bg-gray-200 transition-colors">保存模型</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- 瀛樺偍璁剧疆閫夐」 -->
+                    <div id="tab-storage" class="hidden flex flex-col h-full">
+                        <div class="flex flex-col h-full">
+                            <h3 class="text-sm font-medium text-white mb-1">存储位置</h3>
+                            <p class="text-xs text-gray-500 mb-6">选择一个专用目录，用来持久化保存聊天记录、上传附件和索引数据。</p>
+
+                            <div class="space-y-6">
+                                <div class="bg-[#0d0d0d] border border-white/10 rounded-2xl p-5 space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <div class="p-2 bg-white/5 rounded-lg text-gray-400">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-medium text-white">当前存储目录</p>
+                                                <p id="storage-path-display" class="text-xs text-gray-500 mt-0.5 truncate max-w-[300px]">默认（应用内部目录）</p>
+                                            </div>
+                                        </div>
+                                        <button onclick="selectStorageFolder()" class="px-4 py-2 bg-white text-black text-xs font-semibold rounded-xl hover:bg-gray-200 transition-colors">更改目录</button>
+                                    </div>
+                                    
+                                    <div class="h-px bg-white/5"></div>
+                                    
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-gray-400">自动同步对话内容</span>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="sync-enabled" class="toggle-checkbox" checked>
+                                            <label for="sync-enabled" class="toggle-label"></label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="p-4 bg-orange-500/10 border border-orange-500/20 rounded-2xl">
+                                    <div class="flex gap-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-orange-500 shrink-0"><path d="m12 9 4.1 7H7.9l4.1-7Z"/><path d="M12 2v2"/><path d="m4.9 4.9 1.4 1.4"/><path d="M2 12h2"/><path d="m4.9 19.1 1.4-1.4"/><path d="M12 22v-2"/><path d="m19.1 19.1-1.4-1.4"/><path d="M22 12h-2"/><path d="m19.1 4.9-1.4 1.4"/></svg>
+                                        <p class="text-xs text-orange-200/80 leading-relaxed">
+                                            <strong class="text-orange-400">注意：</strong>修改目录后，新产生的数据会写入新的位置。建议使用一个稳定、非系统盘的文件夹，便于长期保存和迁移。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 渚ц竟鏍忓璇濆垹闄ょ‘璁ゅ脊绐?-->
+    <div id="delete-modal" class="fixed inset-0 z-[110] flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="closeModal()"></div>
+        <div class="relative bg-[#212121] w-[400px] max-w-[90%] rounded-3xl p-6 border border-white/10 modal-content">
+            <h2 class="text-xl font-semibold text-white mb-3">删除对话？</h2>
+            <p class="text-gray-400 text-sm mb-8">这会永久删除这段对话，且无法撤销。</p>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeModal()" class="px-5 py-2.5 rounded-full text-sm text-white hover:bg-white/10 border border-white/10 transition-colors">取消</button>
+                <button onclick="executeDelete()" class="px-5 py-2.5 rounded-full text-sm bg-red-600 text-white hover:bg-red-700 transition-colors">删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GitHub 閾炬帴瀵煎叆寮圭獥 -->
+    <div id="github-modal" class="fixed inset-0 z-[110] flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="closeGithubModal()"></div>
+        <div class="relative bg-[#212121] w-[450px] max-w-[90%] rounded-3xl p-6 border border-white/10 modal-content">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-white">导入 GitHub 仓库</h2>
+                <button onclick="closeGithubModal()" class="text-gray-500 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="space-y-4 mb-8">
+                <p class="text-gray-400 text-sm">输入需要读取的开源仓库链接：</p>
+                <input type="text" id="github-url-input" placeholder="https://github.com/user/repo" class="w-full bg-[#0d0d0d] border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:outline-none focus:border-white/20 transition-colors">
+            </div>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeGithubModal()" class="px-5 py-2.5 rounded-full text-sm text-white hover:bg-white/10 border border-white/10 transition-colors">取消</button>
+                <button onclick="parseGithubRepo()" id="github-parse-btn" class="px-5 py-2.5 rounded-full text-sm font-medium bg-white text-black hover:bg-gray-200 transition-colors">开始解析</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 甯姪鏂囨。寮圭獥 (宸蹭慨澶嶅唴閮ㄩ敊涔辩殑 HTML 缁撴瀯) -->
+    <div id="help-modal" class="fixed inset-0 z-[120] flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="closeHelpModal()"></div>
+        <div class="relative bg-[#171717] w-[700px] max-w-[95%] h-[75vh] rounded-3xl overflow-hidden shadow-2xl border border-white/10 flex flex-col modal-content">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
+                <div class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                    <h2 class="text-lg font-semibold text-white">帮助与功能说明</h2>
+                </div>
+                <button onclick="closeHelpModal()" class="text-gray-500 hover:text-white transition-colors p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-6 scrollbar-hide text-sm text-gray-300 leading-relaxed space-y-8">
+                <section>
+                    <h3 class="text-white font-medium text-base mb-3 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> 1. 基础对话
+                    </h3>
+                    <ul class="list-disc pl-6 space-y-2 text-gray-400 marker:text-gray-600">
+                        <li><strong class="text-gray-200">发送消息：</strong>在底部输入框中输入内容，点击右侧发送按钮或按 <kbd class="px-1.5 py-0.5 bg-white/10 rounded-md text-[11px] font-mono mx-1">Enter</kbd> 发送。</li>
+                        <li><strong class="text-gray-200">欢迎卡片：</strong>首页建议卡片可以直接点击，快速开始一段新对话。</li>
+                        <li><strong class="text-gray-200">提示词快捷栏：</strong>输入框上方支持快速切换全局提示词和当前提示词。</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-white font-medium text-base mb-3 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 2. 侧边栏与历史
+                    </h3>
+                    <ul class="list-disc pl-6 space-y-2 text-gray-400 marker:text-gray-600">
+                        <li><strong class="text-gray-200">新聊天：</strong>点击左侧“新聊天”会清空当前会话，开始新的对话。</li>
+                        <li><strong class="text-gray-200">搜索历史：</strong>可以在侧边栏搜索框中实时筛选历史记录。</li>
+                        <li><strong class="text-gray-200">折叠侧边栏：</strong>点击左上角图标可以收起或展开侧边栏。</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-white font-medium text-base mb-3 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span> 3. 模式与附件
+                    </h3>
+                    <ul class="list-disc pl-6 space-y-2 text-gray-400 marker:text-gray-600">
+                        <li><strong class="text-gray-200">Ask / Agent：</strong>左侧胶囊按钮可以切换普通问答和更主动推进任务的模式。</li>
+                        <li><strong class="text-gray-200">上传附件：</strong>点击输入框左侧 <kbd class="px-1.5 py-0.5 bg-white/10 rounded-md text-[11px] font-mono mx-1">+</kbd> 可上传文件、图片，支持多选。</li>
+                        <li><strong class="text-gray-200">GitHub 导入：</strong>也可以从同一个菜单中导入 GitHub 仓库链接。</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-white font-medium text-base mb-3 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span> 4. 高级设置
+                    </h3>
+                    <p class="text-gray-400 mb-2 pl-4">点击左下角头像，选择“设置”即可打开高级配置。</p>
+                    <ul class="list-disc pl-6 space-y-2 text-gray-400 marker:text-gray-600">
+                        <li><strong class="text-gray-200">提示词：</strong>支持维护全局提示词和仅当前对话生效的提示词。</li>
+                        <li><strong class="text-gray-200">API 设置：</strong>支持手动添加模型，也支持解析 <code class="text-xs bg-white/10 px-1 rounded">curl</code> / Python 配置。</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-white font-medium text-base mb-3 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span> 5. 数据存储
+                    </h3>
+                    <ul class="list-disc pl-6 space-y-2 text-gray-400 marker:text-gray-600">
+                        <li><strong class="text-gray-200">目录选择：</strong>可以在“设置 - 存储设置”里切换数据保存目录。</li>
+                        <li><strong class="text-gray-200">持久化：</strong>聊天记录、上传附件和索引数据都会保存在你选择的位置。</li>
+                        <li><strong class="text-gray-200">自动同步：</strong>开启后会持续把对话内容写入存储目录。</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- 鎻愮ず璇嶅揩鎹烽€夋嫨寮圭獥 -->
+    <div id="prompt-select-modal" class="fixed inset-0 z-[130] flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="closePromptSelectModal()"></div>
+        <div class="relative bg-[#171717] w-[450px] max-w-[90%] max-h-[70vh] rounded-3xl overflow-hidden shadow-2xl border border-white/10 flex flex-col modal-content">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
+                <h2 class="text-lg font-semibold text-white" id="prompt-select-title">选择全局提示词</h2>
+                <button onclick="closePromptSelectModal()" class="text-gray-500 hover:text-white transition-colors p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-5 scrollbar-hide space-y-3" id="prompt-select-list"><div class="bg-[#0d0d0d] border border-white/10 rounded-2xl p-4 flex items-center justify-between gap-4">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-gray-300 line-clamp-3 leading-relaxed"><span class="text-gray-600 italic">暂无内容，请先到设置中编辑提示词。</span></p>
+                    </div>
+                    <div class="flex items-center shrink-0">
+                        <input type="checkbox" id="quick-check-g1" class="toggle-checkbox" checked="" onchange="togglePromptInSelectModal(&#39;g1&#39;, this.checked)">
+                        <label for="quick-check-g1" class="toggle-label"></label>
+                    </div>
+                </div></div>
+            <div class="p-4 border-t border-white/5 flex justify-end shrink-0">
+                <button onclick="closePromptSelectModal()" class="px-6 py-2.5 rounded-full text-sm font-medium bg-white text-black hover:bg-gray-200 transition-colors">完成</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ui = {
+            userInput: document.getElementById('user-input'),
+            speechBtn: document.getElementById('speech-btn'),
+            sendBtn: document.getElementById('send-btn'),
+            messagesList: document.getElementById('messages-list'),
+            welcomeView: document.getElementById('welcome-view'),
+            scrollContainer: document.getElementById('scroll-container'),
+            historyItems: document.getElementById('history-items'),
+            historySearch: document.getElementById('history-search'),
+            sidebarSectionTitle: document.getElementById('sidebar-section-title'),
+            agentProjectPanel: document.getElementById('agent-project-panel'),
+            agentProjectSummary: document.getElementById('agent-project-summary'),
+            agentProjectEmpty: document.getElementById('agent-project-empty'),
+            agentProjectName: document.getElementById('agent-project-name'),
+            agentProjectPath: document.getElementById('agent-project-path'),
+            agentProjectFocus: document.getElementById('agent-project-focus'),
+            profileMenu: document.getElementById('profile-menu'),
+            settingsModal: document.getElementById('settings-modal'),
+            deleteModal: document.getElementById('delete-modal'),
+            githubModal: document.getElementById('github-modal'),
+            helpModal: document.getElementById('help-modal'),
+            promptSelectModal: document.getElementById('prompt-select-modal'), 
+            sidebar: document.getElementById('sidebar'),
+            sidebarOpenBtn: document.getElementById('sidebar-open-btn'),
+            modelDisplay: document.getElementById('current-model-display'),
+            globalList: document.getElementById('global-prompts-list'),
+            specificList: document.getElementById('specific-prompts-list'),
+            attachMenu: document.getElementById('attach-menu'),
+            modelMenu: document.getElementById('model-menu'),
+            askModeBtn: document.getElementById('sidebar-ask-mode-btn'),
+            agentModeBtn: document.getElementById('sidebar-agent-mode-btn'),
+            chatModeBadge: document.getElementById('chat-mode-header-badge')
+        };
+
+        let isTyping = false;
+        let itemPendingDelete = null;
+        let isNewSession = true;
+        let currentSessionId = null;
+        let currentSessionIdsByMode = { ask: null, agent: null };
+        let sessionHistoryCache = [];
+        let agentProjectState = {
+            selected: false,
+            path: '',
+            name: '',
+            tree: [],
+            focusedPath: '',
+        };
+        let expandedProjectDirs = new Set();
+        const LAST_SESSION_STORAGE_KEY_PREFIX = 'chatai:last-session-id:';
+
+        function normalizeHistoryChatMode(mode) {
+            return String(mode || '').toLowerCase() === 'agent' ? 'agent' : 'ask';
+        }
+
+        function getApiBase() {
+            if (window.location && /^https?:$/i.test(window.location.protocol)) {
+                return window.location.origin;
+            }
+            return '';
+        }
+
+        async function apiRequest(path, options = {}) {
+            const headers = { ...(options.headers || {}) };
+            const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+            if (!isFormData && !headers['Content-Type']) {
+                headers['Content-Type'] = 'application/json';
+            }
+
+            const response = await fetch(`${getApiBase()}${path}`, {
+                ...options,
+                headers
+            });
+            return response;
+        }
+
+        async function readJsonSafe(response) {
+            const contentType = response.headers.get('content-type') || '';
+            if (!contentType.includes('application/json')) {
+                return null;
+            }
+
+            try {
+                return await response.json();
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function getCodeBlockLanguage(codeElement) {
+            if (!codeElement || !codeElement.className) {
+                return '';
+            }
+
+            const match = codeElement.className.match(/language-([a-z0-9#+-]+)/i);
+            return match ? match[1].toLowerCase() : '';
+        }
+
+        function getCodeBlockLabel(language, code) {
+            if (language) {
+                return language;
+            }
+            if (/^\s*<svg[\s>]/i.test(code || '')) {
+                return 'svg';
+            }
+            if (/^\s*<!doctype html/i.test(code || '') || /^\s*<html[\s>]/i.test(code || '')) {
+                return 'html';
+            }
+            return 'code';
+        }
+
+        function looksLikeHtmlSnippet(code) {
+            return /<!doctype html|<html[\s>]|<head[\s>]|<body[\s>]|<main[\s>]|<section[\s>]|<div[\s>]|<script[\s>]|<style[\s>]/i.test(code || '');
+        }
+
+        function inferRunnableCodeMode(language, code) {
+            const normalizedLanguage = (language || '').toLowerCase();
+
+            if (['html', 'htm', 'xhtml', 'xml'].includes(normalizedLanguage) || (!normalizedLanguage && looksLikeHtmlSnippet(code))) {
+                return 'html';
+            }
+            if (normalizedLanguage === 'svg' || /^\s*<svg[\s>]/i.test(code || '')) {
+                return 'svg';
+            }
+            if (normalizedLanguage === 'css') {
+                return 'css';
+            }
+            if (['js', 'javascript', 'mjs'].includes(normalizedLanguage)) {
+                return 'javascript';
+            }
+
+            return '';
+        }
+
+        function escapeScriptClosers(text) {
+            return String(text || '').replace(/<\/script/gi, '<\\/script');
+        }
+
+        function escapeStyleClosers(text) {
+            return String(text || '').replace(/<\/style/gi, '<\\/style');
+        }
+
+        function withPreviewBaseHref(documentHtml) {
+            const baseHref = `${window.location.origin}/`;
+            if (/<base[\s>]/i.test(documentHtml)) {
+                return documentHtml;
+            }
+            if (/<head[\s>]/i.test(documentHtml)) {
+                return documentHtml.replace(/<head([^>]*)>/i, `<head$1><base href="${baseHref}">`);
+            }
+            if (/<html[\s>]/i.test(documentHtml)) {
+                return documentHtml.replace(/<html([^>]*)>/i, `<html$1><head><base href="${baseHref}"></head>`);
+            }
+            return `<!DOCTYPE html><html><head><base href="${baseHref}"></head><body>${documentHtml}</body></html>`;
+        }
+
+        function buildRunnableDocument(mode, code) {
+            const source = String(code || '');
+
+            if (mode === 'html') {
+                if (/<!doctype html/i.test(source) || /<html[\s>]/i.test(source)) {
+                    return withPreviewBaseHref(source);
+                }
+                return withPreviewBaseHref(`<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>${source}</body></html>`);
+            }
+
+            if (mode === 'svg') {
+                return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SVG Preview</title><style>html,body{margin:0;min-height:100%;background:#0f172a;display:flex;align-items:center;justify-content:center;}body{padding:24px;box-sizing:border-box;}svg{max-width:100%;max-height:100%;height:auto;}</style></head><body>${source}</body></html>`;
+            }
+
+            if (mode === 'css') {
+                return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CSS Preview</title><style>html,body{margin:0;min-height:100%;background:#ffffff;}body{font-family:Inter,system-ui,sans-serif;}.preview-root{min-height:100vh;}${escapeStyleClosers(source)}</style></head><body><div class="preview-root"><div style="padding:24px;color:#111827;">CSS preview loaded. Add your own DOM structure or global styles in the snippet.</div></div></body></html>`;
+            }
+
+            if (mode === 'javascript') {
+                return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>JavaScript Preview</title><style>html,body{margin:0;min-height:100%;background:#ffffff;}body{font-family:Inter,system-ui,sans-serif;}.preview-root{min-height:100vh;}</style></head><body><div id="app" class="preview-root"></div><script type="module">${escapeScriptClosers(source)}<\/script></body></html>`;
+            }
+
+            return '';
+        }
+
+        function buildPreviewShellHtml(documentHtml, title) {
+            const safeTitle = escapeHtml(title || 'Preview');
+            const serializedDoc = JSON.stringify(String(documentHtml || '')).replace(/<\//g, '<\\/');
+            return `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>${safeTitle}</title><style>html,body{margin:0;height:100%;background:#020617;color:#e5e7eb;font-family:Inter,system-ui,sans-serif;}body{display:flex;flex-direction:column;}header{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid rgba(255,255,255,0.08);background:#0f172a;}header strong{font-size:14px;font-weight:600;}header span{font-size:12px;color:#94a3b8;}iframe{border:0;flex:1;width:100%;background:#ffffff;}</style></head><body><header><strong>${safeTitle}</strong><span>Separate preview window</span></header><iframe id="preview-frame" sandbox="allow-forms allow-modals allow-popups allow-scripts allow-downloads"></iframe><script>const srcdoc = ${serializedDoc};document.getElementById('preview-frame').srcdoc = srcdoc;<\/script></body></html>`;
+        }
+
+        function getDownloadFileName(language, code) {
+            const normalizedLanguage = (language || '').toLowerCase();
+            const extensionMap = {
+                html: 'html',
+                htm: 'html',
+                xhtml: 'html',
+                xml: 'html',
+                svg: 'svg',
+                css: 'css',
+                js: 'js',
+                javascript: 'js',
+                mjs: 'js',
+                json: 'json',
+                markdown: 'md',
+                md: 'md',
+                txt: 'txt',
+                text: 'txt',
+                plaintext: 'txt'
+            };
+
+            let extension = extensionMap[normalizedLanguage];
+            if (!extension) {
+                const mode = inferRunnableCodeMode(normalizedLanguage, code);
+                extension = mode === 'svg' ? 'svg' : mode === 'html' ? 'html' : mode === 'css' ? 'css' : mode === 'javascript' ? 'js' : 'txt';
+            }
+
+            return `snippet-${Date.now()}.${extension}`;
+        }
+
+        function setCodeActionFeedback(button, text) {
+            if (!button) {
+                return;
+            }
+
+            const originalLabel = button.dataset.originalLabel || button.textContent;
+            button.dataset.originalLabel = originalLabel;
+            button.textContent = text;
+            button.disabled = true;
+
+            window.setTimeout(() => {
+                button.textContent = originalLabel;
+                button.disabled = false;
+            }, 1600);
+        }
+
+        function copyTextValue(text) {
+            const value = String(text || '');
+            return new Promise((resolve, reject) => {
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(value).then(resolve).catch(() => {
+                        if (fallbackCopyText(value)) {
+                            resolve();
+                        } else {
+                            reject(new Error('copy_failed'));
+                        }
+                    });
+                    return;
+                }
+
+                if (fallbackCopyText(value)) {
+                    resolve();
+                } else {
+                    reject(new Error('copy_failed'));
+                }
+            });
+        }
+
+        function fallbackCopyText(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.top = '0';
+            textArea.style.left = '0';
+            textArea.style.width = '2em';
+            textArea.style.height = '2em';
+            textArea.style.padding = '0';
+            textArea.style.border = 'none';
+            textArea.style.outline = 'none';
+            textArea.style.boxShadow = 'none';
+            textArea.style.background = 'transparent';
+
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            let successful = false;
+            try {
+                successful = document.execCommand('copy');
+            } catch (error) {
+                successful = false;
+            }
+
+            textArea.remove();
+            return successful;
+        }
+
+        function downloadTextFile(filename, content) {
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.download = filename;
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+            window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        function openRunnablePreview(code, language, button) {
+            const mode = inferRunnableCodeMode(language, code);
+            const runnableDocument = buildRunnableDocument(mode, code);
+            if (!mode || !runnableDocument) {
+                appAlert('This code block is not a directly runnable single-file frontend snippet.');
+                return;
+            }
+
+            const previewWindow = window.open('', '_blank', 'width=1280,height=820');
+            if (!previewWindow) {
+                appAlert('Failed to open the preview window. Please check whether your system blocked the popup.');
+                return;
+            }
+
+            previewWindow.document.open();
+            previewWindow.document.write(buildPreviewShellHtml(runnableDocument, 'Single File Preview'));
+            previewWindow.document.close();
+            previewWindow.focus();
+            setCodeActionFeedback(button, 'Opened');
+        }
+
+        function enhanceCodeBlocks(container) {
+            if (!container) {
+                return;
+            }
+
+            container.querySelectorAll('pre > code').forEach((codeElement) => {
+                const preElement = codeElement.parentElement;
+                if (!preElement || preElement.classList.contains('has-code-toolbar')) {
+                    return;
+                }
+
+                const code = codeElement.textContent || '';
+                const language = getCodeBlockLanguage(codeElement);
+                const displayLabel = getCodeBlockLabel(language, code);
+                const runnableMode = inferRunnableCodeMode(language, code);
+
+                preElement.classList.add('has-code-toolbar');
+
+                const meta = document.createElement('div');
+                meta.className = 'code-block-meta';
+                meta.textContent = displayLabel;
+
+                const toolbar = document.createElement('div');
+                toolbar.className = 'code-block-toolbar code-block-toolbar-inline';
+
+                const actions = document.createElement('div');
+                actions.className = 'code-block-actions';
+
+                if (runnableMode) {
+                    const runButton = document.createElement('button');
+                    runButton.type = 'button';
+                    runButton.className = 'code-tool-btn code-tool-btn--run';
+                    runButton.textContent = 'Run';
+                    runButton.addEventListener('click', () => openRunnablePreview(code, language, runButton));
+                    actions.appendChild(runButton);
+                }
+
+                const downloadButton = document.createElement('button');
+                downloadButton.type = 'button';
+                downloadButton.className = 'code-tool-btn';
+                downloadButton.textContent = 'Save';
+                downloadButton.addEventListener('click', () => {
+                    downloadTextFile(getDownloadFileName(language, code), code);
+                    setCodeActionFeedback(downloadButton, 'Saved');
+                });
+                actions.appendChild(downloadButton);
+
+                const copyButton = document.createElement('button');
+                copyButton.type = 'button';
+                copyButton.className = 'code-tool-btn';
+                copyButton.textContent = 'Copy';
+                copyButton.addEventListener('click', () => {
+                    copyTextValue(code).then(() => {
+                        setCodeActionFeedback(copyButton, 'Copied');
+                    }).catch(() => {
+                        appAlert('Copy failed. Please try again.');
+                    });
+                });
+                actions.appendChild(copyButton);
+
+                toolbar.appendChild(meta);
+                toolbar.appendChild(actions);
+                preElement.insertAdjacentElement('afterend', toolbar);
+            });
+        }
+
+        function escapeHtmlFragment(text) {
+            return String(text || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function neutralizeRawHtmlOutsideCodeFences(markdown) {
+            const source = String(markdown || '');
+            const fencePattern = /(```[\s\S]*?```|~~~[\s\S]*?~~~)/g;
+            const htmlPattern = /<!--[\s\S]*?-->|<![A-Za-z][^>]*>|<\/?[A-Za-z][A-Za-z0-9:-]*(?:\s+[^<>]*)?\/?>/g;
+            let output = '';
+            let cursor = 0;
+            let match;
+
+            while ((match = fencePattern.exec(source))) {
+                output += source.slice(cursor, match.index).replace(htmlPattern, escapeHtmlFragment);
+                output += match[0];
+                cursor = match.index + match[0].length;
+            }
+
+            output += source.slice(cursor).replace(htmlPattern, escapeHtmlFragment);
+            return output;
+        }
+
+        function renderSafeMarkdownHtml(markdown) {
+            const safeSource = neutralizeRawHtmlOutsideCodeFences(markdown);
+            return DOMPurify.sanitize(marked.parse(safeSource), {
+                ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'code', 'pre', 'blockquote', 'ul', 'ol', 'li', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'hr'],
+                ALLOWED_ATTR: ['href', 'title', 'target', 'rel', 'colspan', 'rowspan'],
+                FORBID_ATTR: ['class', 'style', 'src', 'srcset', 'srcdoc', 'onerror', 'onload', 'onclick'],
+            });
+        }
+
+        function renderAssistantMarkdown(element, content) {
+            if (!element) {
+                return;
+            }
+
+            const text = String(content || '');
+            element.setAttribute('data-raw-content', encodeURIComponent(text));
+            element.innerHTML = (typeof marked !== 'undefined' && text)
+                ? renderSafeMarkdownHtml(text)
+                : (text ? escapeHtml(text) : '');
+            enhanceCodeBlocks(element);
+        }
+
+        function setAssistantLoadingState(avatarId, loading) {
+            const avatarEl = document.getElementById(avatarId);
+            if (avatarEl) {
+                avatarEl.classList.toggle('avatar-loading', loading);
+            }
+        }
+
+        function finishTyping(avatarId) {
+            isTyping = false;
+            if (typeof refreshComposerState === 'function') {
+                refreshComposerState();
+            } else {
+                ui.sendBtn.disabled = !ui.userInput.value.trim();
+            }
+            setAssistantLoadingState(avatarId, false);
+        }
+
+        function getLastSessionStorageKey(mode = currentChatMode) {
+            return `${LAST_SESSION_STORAGE_KEY_PREFIX}${normalizeHistoryChatMode(mode)}`;
+        }
+
+        function setCurrentSession(sessionId, mode = currentChatMode) {
+            const normalizedMode = normalizeHistoryChatMode(mode);
+            const normalizedSessionId = sessionId || null;
+
+            currentSessionIdsByMode[normalizedMode] = normalizedSessionId;
+            if (normalizedMode === normalizeHistoryChatMode(currentChatMode)) {
+                currentSessionId = normalizedSessionId;
+            }
+
+            try {
+                const storageKey = getLastSessionStorageKey(normalizedMode);
+                if (normalizedSessionId) {
+                    localStorage.setItem(storageKey, normalizedSessionId);
+                } else {
+                    localStorage.removeItem(storageKey);
+                }
+            } catch (error) {}
+        }
+
+        function getStoredSessionId(mode = currentChatMode) {
+            const normalizedMode = normalizeHistoryChatMode(mode);
+            try {
+                return localStorage.getItem(getLastSessionStorageKey(normalizedMode)) || null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function getSidebarSearchQuery() {
+            return String(ui.historySearch?.value || '').trim().toLowerCase();
+        }
+
+        function normalizeProjectState(payload = {}) {
+            return {
+                selected: Boolean(payload.selected),
+                path: payload.path || '',
+                name: payload.name || '',
+                tree: Array.isArray(payload.tree) ? payload.tree : [],
+                focusedPath: '',
+            };
+        }
+
+        function renderAgentProjectSummary() {
+            const hasProject = Boolean(agentProjectState.selected && agentProjectState.path);
+            ui.agentProjectPanel?.classList.toggle('hidden', currentChatMode !== 'agent');
+            ui.agentProjectSummary?.classList.toggle('hidden', !hasProject);
+            ui.agentProjectEmpty?.classList.toggle('hidden', hasProject);
+
+            if (!hasProject) {
+                if (ui.agentProjectFocus) {
+                    ui.agentProjectFocus.textContent = '';
+                }
+                return;
+            }
+
+            if (ui.agentProjectName) {
+                ui.agentProjectName.textContent = agentProjectState.name || '已选择项目';
+                ui.agentProjectName.title = agentProjectState.name || '已选择项目';
+            }
+            if (ui.agentProjectPath) {
+                ui.agentProjectPath.textContent = agentProjectState.path;
+                ui.agentProjectPath.title = agentProjectState.path || '';
+            }
+            if (ui.agentProjectFocus) {
+                const focusLabel = agentProjectState.focusedPath
+                    ? `当前焦点 · ${agentProjectState.focusedPath}`
+                    : '当前焦点 · 项目根目录';
+                ui.agentProjectFocus.textContent = focusLabel;
+                ui.agentProjectFocus.title = focusLabel;
+            }
+        }
+
+        function nodeMatchesQuery(node, query) {
+            if (!query) {
+                return true;
+            }
+
+            const text = `${node.name} ${node.path}`.toLowerCase();
+            if (text.includes(query)) {
+                return true;
+            }
+
+            return Array.isArray(node.children) && node.children.some((child) => nodeMatchesQuery(child, query));
+        }
+
+        function createProjectTreeNode(node, depth = 0, query = '') {
+            if (!nodeMatchesQuery(node, query)) {
+                return null;
+            }
+
+            const isDirectory = node.type === 'directory';
+            const isExpanded = query ? true : expandedProjectDirs.has(node.path);
+            const row = document.createElement('div');
+            row.className = `agent-tree-entry flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-gray-300 ${agentProjectState.focusedPath === node.path ? 'agent-tree-entry-active' : ''}`;
+            row.style.paddingLeft = `${depth * 16 + 8}px`;
+
+            if (isDirectory) {
+                const toggle = document.createElement('button');
+                toggle.type = 'button';
+                toggle.className = 'agent-tree-toggle';
+                toggle.innerHTML = isExpanded ? '&#9662;' : '&#9656;';
+                toggle.onclick = (event) => {
+                    event.stopPropagation();
+                    if (expandedProjectDirs.has(node.path)) {
+                        expandedProjectDirs.delete(node.path);
+                    } else {
+                        expandedProjectDirs.add(node.path);
+                    }
+                    renderSidebarContent();
+                };
+                row.appendChild(toggle);
+            } else {
+                const dot = document.createElement('span');
+                dot.className = 'agent-tree-toggle';
+                dot.textContent = '•';
+                row.appendChild(dot);
+            }
+
+            const label = document.createElement('button');
+            label.type = 'button';
+            label.className = 'min-w-0 flex-1 truncate text-left';
+            label.textContent = node.name;
+            label.onclick = () => {
+                agentProjectState.focusedPath = node.path;
+                renderAgentProjectSummary();
+                renderSidebarContent();
+            };
+            row.appendChild(label);
+
+            const wrapper = document.createElement('div');
+            wrapper.appendChild(row);
+
+            if (isDirectory && isExpanded && Array.isArray(node.children) && node.children.length > 0) {
+                const children = document.createElement('div');
+                children.className = 'agent-tree-children';
+                node.children.forEach((child) => {
+                    const childNode = createProjectTreeNode(child, depth + 1, query);
+                    if (childNode) {
+                        children.appendChild(childNode);
+                    }
+                });
+                wrapper.appendChild(children);
+            }
+
+            return wrapper;
+        }
+
+        function renderAgentProjectTree() {
+            ui.historyItems.innerHTML = '';
+            renderAgentProjectSummary();
+
+            if (!agentProjectState.selected || !agentProjectState.path) {
+                return;
+            }
+
+            const query = getSidebarSearchQuery();
+            agentProjectState.tree.forEach((node) => {
+                const nodeElement = createProjectTreeNode(node, 0, query);
+                if (nodeElement) {
+                    ui.historyItems.appendChild(nodeElement);
+                }
+            });
+        }
+
+        function renderSidebarContent() {
+            if (currentChatMode === 'agent') {
+                if (ui.sidebarSectionTitle) {
+                    ui.sidebarSectionTitle.textContent = '项目文件';
+                }
+                if (ui.historySearch) {
+                    ui.historySearch.placeholder = '搜索文件或文件夹';
+                }
+                renderAgentProjectTree();
+                return;
+            }
+
+            if (ui.agentProjectPanel) {
+                ui.agentProjectPanel.classList.add('hidden');
+            }
+            if (ui.sidebarSectionTitle) {
+                ui.sidebarSectionTitle.textContent = '最近对话';
+            }
+            if (ui.historySearch) {
+                ui.historySearch.placeholder = '搜索';
+            }
+
+            ui.historyItems.innerHTML = '';
+            sessionHistoryCache.forEach((session) => {
+                ui.historyItems.appendChild(createHistoryItem(session));
+            });
+            setHistoryItemActive(currentSessionId);
+            handleHistorySearch(ui.historySearch?.value || '');
+        }
+
+        function buildProjectTreeSummary(nodes, depth = 0, lines = []) {
+            for (const node of nodes || []) {
+                if (lines.length >= 80) {
+                    break;
+                }
+                const indent = '  '.repeat(depth);
+                lines.push(`${indent}${node.type === 'directory' ? '[D]' : '[F]'} ${node.path || node.name}`);
+                if (node.type === 'directory' && Array.isArray(node.children) && node.children.length > 0) {
+                    buildProjectTreeSummary(node.children, depth + 1, lines);
+                }
+            }
+            return lines;
+        }
+
+        function buildSelectedProjectContext() {
+            if (!agentProjectState.selected || !agentProjectState.path) {
+                return null;
+            }
+
+            return {
+                root_path: agentProjectState.path,
+                root_name: agentProjectState.name,
+                focused_path: agentProjectState.focusedPath || '',
+                tree_summary: buildProjectTreeSummary(agentProjectState.tree).join('\n'),
+            };
+        }
+
+        async function loadAgentProject() {
+            try {
+                const response = await apiRequest('/api/projects', { method: 'GET', headers: {} });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                const result = await response.json();
+                agentProjectState = normalizeProjectState(result);
+                if (agentProjectState.selected) {
+                    expandedProjectDirs = new Set(['']);
+                }
+                renderSidebarContent();
+            } catch (error) {
+                console.error('Failed to load project tree:', error);
+                agentProjectState = normalizeProjectState({});
+                renderSidebarContent();
+            }
+        }
+
+        async function selectAgentProject() {
+            try {
+                const response = await apiRequest('/api/projects/select', {
+                    method: 'POST',
+                    body: JSON.stringify({}),
+                });
+                const result = await readJsonSafe(response);
+                if (!response.ok) {
+                    throw new Error(result?.detail || `HTTP ${response.status}`);
+                }
+                if (result?.cancelled) {
+                    return;
+                }
+
+                agentProjectState = normalizeProjectState(result);
+                expandedProjectDirs = new Set(['']);
+                renderSidebarContent();
+            } catch (error) {
+                appAlert(error.message || '选择项目文件夹失败。');
+            }
+        }
+
+        async function refreshAgentProject() {
+            await loadAgentProject();
+        }
+
+        window.focusAgentProjectPath = function focusAgentProjectPath(targetPath) {
+            const nextPath = String(targetPath || '').trim().replace(/\\/g, '/');
+            if (!nextPath || !agentProjectState.selected) {
+                return false;
+            }
+
+            const segments = nextPath.split('/').filter(Boolean);
+            let currentPath = '';
+            for (let index = 0; index < segments.length - 1; index += 1) {
+                currentPath = currentPath ? `${currentPath}/${segments[index]}` : segments[index];
+                expandedProjectDirs.add(currentPath);
+            }
+
+            agentProjectState.focusedPath = nextPath;
+            renderAgentProjectSummary();
+            renderSidebarContent();
+            return true;
+        };
+
+        async function clearAgentProject() {
+            try {
+                const response = await apiRequest('/api/projects/clear', {
+                    method: 'POST',
+                    body: JSON.stringify({}),
+                });
+                const result = await readJsonSafe(response);
+                if (!response.ok) {
+                    throw new Error(result?.detail || `HTTP ${response.status}`);
+                }
+                agentProjectState = normalizeProjectState(result);
+                expandedProjectDirs = new Set();
+                renderSidebarContent();
+            } catch (error) {
+                appAlert(error.message || '清除项目文件夹失败。');
+            }
+        }
+
+        function setHistoryItemActive(sessionId) {
+            document.querySelectorAll('.history-entry').forEach((entry) => {
+                const isActive = entry.dataset.sessionId === sessionId;
+                const button = entry.querySelector('.history-session-btn');
+                if (!button) return;
+                button.classList.toggle('bg-white/10', isActive);
+                button.classList.toggle('text-white', isActive);
+                button.classList.toggle('font-medium', isActive);
+                button.classList.toggle('text-gray-300', !isActive);
+            });
+        }
+
+        function createHistoryItem(session) {
+            const item = document.createElement('div');
+            item.className = 'group relative flex items-center history-entry';
+            item.dataset.sessionId = session.id;
+            item.dataset.title = session.title || '';
+            item.innerHTML = `
+                <button onclick="openSession('${session.id}')" class="history-session-btn sidebar-item flex-1 text-left px-3 py-2 rounded-lg text-sm truncate text-gray-300 pr-8">${escapeHtml(session.title || 'New Chat')}</button>
+                <button onclick="confirmDelete(this, event)" class="action-btn absolute right-2 p-1 text-gray-500 hover:text-red-400" title="删除会话">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                </button>
+            `;
+            return item;
+        }
+
+        function renderSessionHistory(sessions) {
+            sessionHistoryCache = Array.isArray(sessions) ? sessions : [];
+            renderSidebarContent();
+        }
+
+        async function loadSessionHistory(preferredSessionId = null, options = {}) {
+            try {
+                const activeMode = normalizeHistoryChatMode(currentChatMode);
+                const response = await apiRequest(`/api/sessions?chat_mode=${encodeURIComponent(activeMode)}`, { method: 'GET', headers: {} });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const sessions = await response.json();
+                renderSessionHistory(Array.isArray(sessions) ? sessions : []);
+
+                const nextSessionId = preferredSessionId || currentSessionIdsByMode[activeMode] || getStoredSessionId(activeMode);
+                const hasNextSession = Boolean(nextSessionId && sessions.some((session) => session.id === nextSessionId));
+                if (options.openPreferred !== false && hasNextSession) {
+                    await openSession(nextSessionId, { suppressHistoryReload: true });
+                } else if (nextSessionId) {
+                    if (hasNextSession) {
+                        setHistoryItemActive(nextSessionId);
+                    } else {
+                        setCurrentSession(null, activeMode);
+                    }
+                } else {
+                    setCurrentSession(null, activeMode);
+                }
+            } catch (error) {
+                console.error('Failed to load sessions:', error);
+                sessionHistoryCache = [];
+                ui.historyItems.innerHTML = '';
+            }
+        }
+
+        async function openSession(sessionId, options = {}) {
+            if (!sessionId) {
+                return;
+            }
+
+            const response = await apiRequest(`/api/sessions/${encodeURIComponent(sessionId)}`, { method: 'GET', headers: {} });
+            const result = await readJsonSafe(response);
+            if (!response.ok || !result?.id) {
+                appAlert(result?.detail || 'Failed to load this conversation.');
+                return;
+            }
+
+            const sessionMode = normalizeHistoryChatMode(result.chat_mode);
+            if (sessionMode !== normalizeHistoryChatMode(currentChatMode)) {
+                appAlert(`This conversation belongs to ${sessionMode === 'agent' ? 'Agent' : 'Ask'} mode and is isolated from the current mode.`);
+                return;
+            }
+
+            ui.messagesList.innerHTML = '';
+            const messages = Array.isArray(result.messages) ? result.messages : [];
+            const agentRuns = Array.isArray(result.agent_runs) ? result.agent_runs : [];
+            const agentRunMap = new Map(
+                agentRuns
+                    .filter((run) => run && run.assistant_message_id)
+                    .map((run) => [run.assistant_message_id, run])
+            );
+            if (messages.length > 0) {
+                ui.welcomeView.classList.add('hidden');
+                ui.messagesList.classList.remove('hidden');
+                messages.forEach((message) => {
+                    const rendered = addMessage(message.role, message.content || '', false, {
+                        messageId: message.id,
+                    });
+                    if (
+                        message.role === 'assistant'
+                        && rendered?.msgId
+                        && agentRunMap.has(message.id)
+                        && typeof window.hydrateAgentRunReplayByContentId === 'function'
+                    ) {
+                        window.hydrateAgentRunReplayByContentId(rendered.msgId, agentRunMap.get(message.id));
+                    }
+                });
+            } else {
+                ui.messagesList.classList.add('hidden');
+                ui.welcomeView.classList.remove('hidden');
+            }
+
+            setCurrentSession(result.id, sessionMode);
+            isTyping = false;
+            isNewSession = false;
+            if (typeof refreshComposerState === 'function') {
+                refreshComposerState();
+            } else {
+                ui.sendBtn.disabled = !ui.userInput.value.trim();
+            }
+            setHistoryItemActive(result.id);
+
+            if (!options.suppressHistoryReload) {
+                await loadSessionHistory(result.id);
+            }
+
+            if (typeof loadPrompts === 'function') {
+                await loadPrompts();
+            }
+        }
+
+        async function deleteSession(sessionId) {
+            if (!sessionId) {
+                return false;
+            }
+
+            const response = await apiRequest(`/api/sessions/${encodeURIComponent(sessionId)}`, { method: 'DELETE' });
+            if (!response.ok && response.status !== 204) {
+                const result = await readJsonSafe(response);
+                appAlert(result?.detail || 'Failed to delete this conversation.');
+                return false;
+            }
+
+            const activeMode = normalizeHistoryChatMode(currentChatMode);
+            if (currentSessionId === sessionId) {
+                setCurrentSession(null, activeMode);
+                isNewSession = true;
+                ui.messagesList.innerHTML = '';
+                ui.messagesList.classList.add('hidden');
+                ui.welcomeView.classList.remove('hidden');
+                ui.userInput.value = '';
+                ui.userInput.style.height = 'auto';
+                if (typeof refreshComposerState === 'function') {
+                    refreshComposerState();
+                } else {
+                    ui.sendBtn.disabled = true;
+                }
+            }
+
+            await loadSessionHistory();
+            return true;
+        }
+
+        window.handleChatModeChanged = async function handleChatModeChanged(nextMode) {
+            const normalizedMode = normalizeHistoryChatMode(nextMode);
+            currentSessionId = currentSessionIdsByMode[normalizedMode] || getStoredSessionId(normalizedMode) || null;
+            isNewSession = !currentSessionId;
+
+            ui.messagesList.innerHTML = '';
+            ui.messagesList.classList.add('hidden');
+            ui.welcomeView.classList.remove('hidden');
+
+            if (typeof loadPrompts === 'function') {
+                loadPrompts();
+            }
+
+            await loadSessionHistory(currentSessionId, { openPreferred: true });
+        };
+
+        // --- 鎻愮ず璇嶇鐞嗛€昏緫 ---
+        const promptsState = {
+            global: [{ id: 'g1', text: '', enabled: true }], 
+            specific: [{ id: 's1', text: '', enabled: false }] 
+        };
+
+        function renderPrompts() {
+            renderList('global', ui.globalList);
+            renderList('specific', ui.specificList);
+            renderPromptStatus();
+        }
+
+        function renderPromptStatus() {
+            const globalEnabled = promptsState.global.some(p => p.enabled);
+            const specificEnabled = promptsState.specific.some(p => p.enabled);
+            const bar = document.getElementById('prompt-status-bar');
+            if (!bar) return;
+
+            bar.innerHTML = `
+                <button type="button" onclick="openPromptSelectModal('global', event)" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${globalEnabled ? 'bg-[#2f2f2f] text-gray-200 border border-white/10 shadow-sm' : 'bg-transparent text-gray-500 hover:bg-white/5 border border-transparent'}">
+                    <span class="w-1.5 h-1.5 rounded-full ${globalEnabled ? 'bg-[#10b981]' : 'bg-gray-600'}"></span>
+                    全局提示词
+                </button>
+                <button type="button" onclick="openPromptSelectModal('specific', event)" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${specificEnabled ? 'bg-[#2f2f2f] text-gray-200 border border-white/10 shadow-sm' : 'bg-transparent text-gray-500 hover:bg-white/5 border border-transparent'}">
+                    <span class="w-1.5 h-1.5 rounded-full ${specificEnabled ? 'bg-[#10b981]' : 'bg-gray-600'}"></span>
+                    当前提示词
+                </button>
+            `;
+        }
+
+        // --- 蹇嵎閫夋嫨寮圭獥閫昏緫 ---
+        let currentPromptSelectType = 'global';
+
+        function openPromptSelectModal(type, e) {
+            if (e) e.stopPropagation();
+            closeAllMenus();
+            
+            currentPromptSelectType = type;
+            const titleEl = document.getElementById('prompt-select-title');
+            if (titleEl) titleEl.textContent = type === 'global' ? '选择全局提示词' : '选择当前提示词';
+            
+            renderPromptSelectList();
+            
+            const modal = ui.promptSelectModal || document.getElementById('prompt-select-modal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closePromptSelectModal() {
+            const modal = ui.promptSelectModal || document.getElementById('prompt-select-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function renderPromptSelectList() {
+            const container = document.getElementById('prompt-select-list');
+            container.innerHTML = '';
+            
+            const prompts = promptsState[currentPromptSelectType];
+            if (prompts.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-sm text-gray-500">暂无提示词，请先到设置中添加。</div>`;
+                return;
+            }
+
+            prompts.forEach(p => {
+                const div = document.createElement('div');
+                div.className = "bg-[#0d0d0d] border border-white/10 rounded-2xl p-4 flex items-center justify-between gap-4";
+                
+                const textPreview = p.text.trim() ? escapeHtml(p.text) : '<span class="text-gray-600 italic">暂无内容，请先在设置中编辑。</span>';
+                
+                div.innerHTML = `
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-gray-300 line-clamp-3 leading-relaxed">${textPreview}</p>
+                    </div>
+                    <div class="flex items-center shrink-0">
+                        <input type="checkbox" id="quick-check-${p.id}" class="toggle-checkbox" ${p.enabled ? 'checked' : ''} onchange="togglePromptInSelectModal('${p.id}', this.checked)">
+                        <label for="quick-check-${p.id}" class="toggle-label"></label>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function togglePromptInSelectModal(id, val) {
+            const p = promptsState[currentPromptSelectType].find(x => x.id === id);
+            if (p) p.enabled = val;
+            renderPrompts(); 
+        }
+
+        function renderList(type, container) {
+            container.innerHTML = '';
+            promptsState[type].forEach(p => {
+                const div = document.createElement('div');
+                div.className = "bg-[#0d0d0d] border border-white/10 rounded-2xl p-4 space-y-3";
+                const placeholderText = type === 'global' ? '例如：请始终使用专业、客观、简洁的语气回复。' : '针对这个任务的特殊要求，例如输出格式、语气或限制条件。';
+                div.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] uppercase font-bold text-gray-600 tracking-widest">${type === 'global' ? 'Global' : 'Current'} Item</span>
+                        <div class="flex items-center gap-3">
+                            <button onclick="removePrompt('${type}', '${p.id}')" class="p-1 text-gray-500 hover:text-red-400 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                            </button>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="check-${p.id}" class="toggle-checkbox" ${p.enabled ? 'checked' : ''} onchange="togglePrompt('${type}', '${p.id}', this.checked)">
+                                <label for="check-${p.id}" class="toggle-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea class="w-full bg-transparent border-none focus:outline-none text-sm text-gray-300 placeholder-gray-600 resize-none h-16" placeholder="${placeholderText}" oninput="updatePromptText('${type}', '${p.id}', this.value)">${p.text}</textarea>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addPrompt(type) {
+            const id = Math.random().toString(36).substr(2, 9);
+            promptsState[type].push({ id, text: '', enabled: true });
+            renderPrompts();
+        }
+        function removePrompt(type, id) { promptsState[type] = promptsState[type].filter(p => p.id !== id); renderPrompts(); }
+        function togglePrompt(type, id, val) { const p = promptsState[type].find(x => x.id === id); if (p) p.enabled = val; }
+        function updatePromptText(type, id, val) { const p = promptsState[type].find(x => x.id === id); if (p) p.text = val; }
+
+        // Real prompt integration with backend APIs.
+        promptsState.global = [];
+        promptsState.specific = [];
+        currentPromptSelectType = 'global';
+
+        const promptSaveTimers = new Map();
+        let promptsLoading = false;
+
+        function normalizePrompt(prompt, fallbackType) {
+            return {
+                id: prompt.id,
+                type: prompt.type || fallbackType,
+                text: prompt.text || '',
+                enabled: Boolean(prompt.enabled),
+                session_id: prompt.session_id || null
+            };
+        }
+
+        function getPromptList(type) {
+            return Array.isArray(promptsState[type]) ? promptsState[type] : [];
+        }
+
+        function updatePromptState(type, id, patch) {
+            const prompt = getPromptList(type).find(item => item.id === id);
+            if (!prompt) return null;
+            Object.assign(prompt, patch);
+            return prompt;
+        }
+
+        function clearPromptSaveTimer(promptId) {
+            const timer = promptSaveTimers.get(promptId);
+            if (!timer) return;
+
+            clearTimeout(timer);
+            promptSaveTimers.delete(promptId);
+        }
+
+        async function ensurePromptSession() {
+            if (currentSessionId) {
+                return currentSessionId;
+            }
+
+            const draftTitle = ui.userInput.value.trim();
+            const response = await apiRequest('/api/sessions', {
+                method: 'POST',
+                body: JSON.stringify({
+                    title: draftTitle ? draftTitle.slice(0, 30) : 'New Chat',
+                    chat_mode: normalizeHistoryChatMode(currentChatMode),
+                })
+            });
+            const data = await readJsonSafe(response);
+
+            if (!response.ok || !data?.id) {
+                throw new Error(data?.detail || 'Failed to create the chat session.');
+            }
+
+            setCurrentSession(data.id, data.chat_mode || currentChatMode);
+            return currentSessionId;
+        }
+
+        async function loadPrompts() {
+            if (promptsLoading) {
+                return;
+            }
+
+            promptsLoading = true;
+            try {
+                const globalRequest = apiRequest('/api/prompts?type=global', { method: 'GET', headers: {} });
+                const specificRequest = currentSessionId
+                    ? apiRequest(`/api/prompts?type=specific&session_id=${encodeURIComponent(currentSessionId)}`, { method: 'GET', headers: {} })
+                    : Promise.resolve(null);
+
+                const [globalResponse, specificResponse] = await Promise.all([globalRequest, specificRequest]);
+                const globalPrompts = globalResponse && globalResponse.ok ? ((await readJsonSafe(globalResponse)) || []) : [];
+                const specificPrompts = specificResponse && specificResponse.ok ? ((await readJsonSafe(specificResponse)) || []) : [];
+
+                promptsState.global = globalPrompts.map(prompt => normalizePrompt(prompt, 'global'));
+                promptsState.specific = specificPrompts.map(prompt => normalizePrompt(prompt, 'specific'));
+            } catch (error) {
+                console.error('Failed to load prompts:', error);
+            } finally {
+                promptsLoading = false;
+                renderPrompts();
+            }
+        }
+
+        function renderPrompts() {
+            renderList('global', ui.globalList);
+            renderList('specific', ui.specificList);
+            renderPromptStatus();
+
+            const modal = ui.promptSelectModal || document.getElementById('prompt-select-modal');
+            if (modal && !modal.classList.contains('hidden')) {
+                renderPromptSelectList();
+            }
+        }
+
+        function renderPromptStatus() {
+            const globalEnabled = getPromptList('global').some(prompt => prompt.enabled);
+            const specificEnabled = getPromptList('specific').some(prompt => prompt.enabled);
+            const bar = document.getElementById('prompt-status-bar');
+            if (!bar) return;
+
+            bar.innerHTML = `
+                <button type="button" onclick="openPromptSelectModal('global', event)" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${globalEnabled ? 'bg-[#2f2f2f] text-gray-200 border border-white/10 shadow-sm' : 'bg-transparent text-gray-500 hover:bg-white/5 border border-transparent'}">
+                    <span class="w-1.5 h-1.5 rounded-full ${globalEnabled ? 'bg-[#10b981]' : 'bg-gray-600'}"></span>
+                    全局提示词
+                </button>
+                <button type="button" onclick="openPromptSelectModal('specific', event)" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${specificEnabled ? 'bg-[#2f2f2f] text-gray-200 border border-white/10 shadow-sm' : 'bg-transparent text-gray-500 hover:bg-white/5 border border-transparent'}">
+                    <span class="w-1.5 h-1.5 rounded-full ${specificEnabled ? 'bg-[#10b981]' : 'bg-gray-600'}"></span>
+                    当前提示词
+                </button>
+            `;
+        }
+
+        async function openPromptSelectModal(type, e) {
+            if (e) e.stopPropagation();
+            closeAllMenus();
+
+            currentPromptSelectType = type;
+            await loadPrompts();
+
+            const titleEl = document.getElementById('prompt-select-title');
+            if (titleEl) {
+                titleEl.textContent = type === 'global' ? '选择全局提示词' : '选择当前提示词';
+            }
+
+            renderPromptSelectList();
+
+            const modal = ui.promptSelectModal || document.getElementById('prompt-select-modal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function renderPromptSelectList() {
+            const container = document.getElementById('prompt-select-list');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            const prompts = getPromptList(currentPromptSelectType);
+            if (prompts.length === 0) {
+                const emptyText = currentPromptSelectType === 'specific' && !currentSessionId
+                    ? 'No session exists yet. Send a message first, or add a session prompt in Settings.'
+                    : 'No prompts available yet. Please add one in Settings.';
+                container.innerHTML = `<div class="text-center py-8 text-sm text-gray-500">${emptyText}</div>`;
+                return;
+            }
+
+            prompts.forEach(prompt => {
+                const div = document.createElement('div');
+                div.className = 'bg-[#0d0d0d] border border-white/10 rounded-2xl p-4 flex items-center justify-between gap-4';
+
+                const textPreview = prompt.text.trim()
+                    ? escapeHtml(prompt.text)
+                    : '<span class="text-gray-600 italic">暂无内容，请先到设置中编辑。</span>';
+
+                div.innerHTML = `
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-gray-300 line-clamp-3 leading-relaxed">${textPreview}</p>
+                    </div>
+                    <div class="flex items-center shrink-0">
+                        <input type="checkbox" id="quick-check-${prompt.id}" class="toggle-checkbox" ${prompt.enabled ? 'checked' : ''} onchange="togglePromptInSelectModal('${prompt.id}', this.checked)">
+                        <label for="quick-check-${prompt.id}" class="toggle-label"></label>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        async function togglePromptInSelectModal(id, val) {
+            await togglePrompt(currentPromptSelectType, id, val);
+        }
+
+        function renderList(type, container) {
+            container.innerHTML = '';
+
+            const prompts = getPromptList(type);
+            if (prompts.length === 0) {
+                const emptyMessage = type === 'specific' && !currentSessionId
+                    ? 'This new chat does not have session context yet. A session will be created automatically once you send a message.'
+                    : type === 'global'
+                        ? 'There are no global prompts yet. Added global prompts will apply to all chats.'
+                        : 'There are no session prompts for the current chat yet.';
+                container.innerHTML = `
+                    <div class="bg-[#0d0d0d] border border-dashed border-white/10 rounded-2xl p-4 text-sm text-gray-500 leading-relaxed">
+                        ${emptyMessage}
+                    </div>
+                `;
+                return;
+            }
+
+            prompts.forEach(prompt => {
+                const div = document.createElement('div');
+                div.className = 'bg-[#0d0d0d] border border-white/10 rounded-2xl p-4 space-y-3';
+                const placeholderText = type === 'global'
+                    ? 'Example: Always reply in a professional, objective, and concise tone.'
+                    : 'Example: For this chat, provide only conclusions and skip step-by-step reasoning.';
+                div.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] uppercase font-bold text-gray-600 tracking-widest">${type === 'global' ? 'Global' : 'Current'} Item</span>
+                        <div class="flex items-center gap-3">
+                            <button onclick="removePrompt('${type}', '${prompt.id}')" class="p-1 text-gray-500 hover:text-red-400 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                            </button>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="check-${prompt.id}" class="toggle-checkbox" ${prompt.enabled ? 'checked' : ''} onchange="togglePrompt('${type}', '${prompt.id}', this.checked)">
+                                <label for="check-${prompt.id}" class="toggle-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea class="w-full bg-transparent border-none focus:outline-none text-sm text-gray-300 placeholder-gray-600 resize-none h-16" placeholder="${placeholderText}" oninput="updatePromptText('${type}', '${prompt.id}', this.value)" onblur="flushPromptSave('${type}', '${prompt.id}')">${escapeHtml(prompt.text)}</textarea>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        async function addPrompt(type) {
+            try {
+                const sessionId = type === 'specific' ? await ensurePromptSession() : null;
+                const response = await apiRequest('/api/prompts', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        type,
+                        text: '',
+                        enabled: true,
+                        session_id: sessionId
+                    })
+                });
+                const prompt = await readJsonSafe(response);
+
+                if (!response.ok || !prompt?.id) {
+                    throw new Error(prompt?.detail || 'Failed to add the prompt.');
+                }
+
+                await loadPrompts();
+                const container = type === 'global' ? ui.globalList : ui.specificList;
+                requestAnimationFrame(() => {
+                    const textareas = container.querySelectorAll('textarea');
+                    const last = textareas[textareas.length - 1];
+                    if (last) last.focus();
+                });
+            } catch (error) {
+                appAlert(error.message || 'Failed to add the prompt.');
+            }
+        }
+
+        async function removePrompt(type, id) {
+            clearPromptSaveTimer(id);
+
+            const response = await apiRequest(`/api/prompts/${id}`, { method: 'DELETE' });
+            if (!response.ok && response.status !== 204) {
+                const error = await readJsonSafe(response);
+                appAlert(error?.detail || 'Failed to delete the prompt.');
+                return;
+            }
+
+            promptsState[type] = getPromptList(type).filter(prompt => prompt.id !== id);
+            renderPrompts();
+        }
+
+        async function togglePrompt(type, id, val) {
+            const prompt = updatePromptState(type, id, { enabled: val });
+            if (!prompt) return;
+
+            renderPrompts();
+
+            const response = await apiRequest(`/api/prompts/${id}/toggle`, {
+                method: 'PATCH',
+                body: JSON.stringify({ enabled: val })
+            });
+            const result = await readJsonSafe(response);
+
+            if (!response.ok || !result?.id) {
+                updatePromptState(type, id, { enabled: !val });
+                renderPrompts();
+                appAlert(result?.detail || 'Failed to toggle the prompt state.');
+                return;
+            }
+
+            updatePromptState(type, id, normalizePrompt(result, type));
+            renderPrompts();
+        }
+
+        async function persistPromptText(type, id, text, silent = false) {
+            const response = await apiRequest(`/api/prompts/${id}`, {
+                method: 'PUT',
+                body: JSON.stringify({ text })
+            });
+            const result = await readJsonSafe(response);
+
+            if (!response.ok || !result?.id) {
+                if (!silent) {
+                    appAlert(result?.detail || 'Failed to save the prompt.');
+                }
+                return false;
+            }
+
+            updatePromptState(type, id, normalizePrompt(result, type));
+            return true;
+        }
+
+        function updatePromptText(type, id, val) {
+            updatePromptState(type, id, { text: val });
+            clearPromptSaveTimer(id);
+
+            const timer = setTimeout(() => {
+                promptSaveTimers.delete(id);
+                persistPromptText(type, id, val, true);
+            }, 400);
+
+            promptSaveTimers.set(id, timer);
+        }
+
+        async function flushPromptSave(type, id) {
+            const prompt = getPromptList(type).find(item => item.id === id);
+            if (!prompt) return;
+
+            clearPromptSaveTimer(id);
+            await persistPromptText(type, id, prompt.text, false);
+        }
+
+
+        // --- API 妯″瀷绠＄悊閫昏緫 ---
+        let apiModels = [];
+        let editingModelId = null;
+
+        function normalizeModel(model) {
+            return {
+                id: model.id,
+                name: model.name,
+                url: model.base_url || model.url || '',
+                key: '',
+                keyMasked: model.api_key_masked || '',
+                modelId: model.model_id || model.name,
+                active: Boolean(model.is_active ?? model.active)
+            };
+        }
+
+        function getActiveModel() {
+            return apiModels.find(m => m.active) || null;
+        }
+
+        function syncModelDisplay() {
+            const activeModel = getActiveModel();
+            ui.modelDisplay.textContent = activeModel ? activeModel.name : 'Configure a model';
+        }
+
+        async function loadModels() {
+            try {
+                const response = await apiRequest('/api/models', { method: 'GET', headers: {} });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                apiModels = data.map(normalizeModel);
+            } catch (error) {
+                console.error('Failed to load models:', error);
+                apiModels = [];
+            }
+
+            syncModelDisplay();
+            renderApiModels();
+        }
+
+        function renderApiModels() {
+            const container = document.getElementById('api-models-container');
+            container.innerHTML = '';
+            
+            if (apiModels.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-sm text-gray-500">暂无模型配置，请点击右上角添加。</div>`;
+                return;
+            }
+
+            apiModels.forEach(m => {
+                const div = document.createElement('div');
+                div.className = `flex items-center justify-between p-4 bg-[#0d0d0d] border ${m.active ? 'border-white/40' : 'border-white/5 hover:border-white/20'} rounded-2xl group transition-all`;
+                div.innerHTML = `
+                    <div class="flex items-center gap-4 flex-1 min-w-0 cursor-pointer" onclick="setActiveModel('${m.id}')">
+                        <div class="w-2.5 h-2.5 rounded-full ${m.active ? 'bg-white' : 'bg-gray-600'} transition-colors shrink-0"></div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-medium text-white truncate">${escapeHtml(m.name)}</p>
+                            <p class="text-[11px] text-gray-500 mt-0.5 truncate max-w-[200px]">${escapeHtml(m.url)}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="showApiEditView('${m.id}')" class="p-1.5 text-gray-400 hover:text-white rounded-lg bg-white/5 hover:bg-white/10 transition-colors" title="编辑">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                        </button>
+                        <button onclick="deleteApiModel('${m.id}')" class="p-1.5 text-gray-400 hover:text-red-400 rounded-lg bg-white/5 hover:bg-white/10 transition-colors" title="删除">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function showApiListView() {
+            document.getElementById('api-list-view').classList.remove('hidden');
+            document.getElementById('api-edit-view').classList.add('hidden');
+            renderApiModels();
+        }
+
+        // showApiEditView, saveApiModel, deleteApiModel, setActiveModel
+        // 杩欎簺鍑芥暟鐢?app.js 鎻愪緵鐪熷疄 API 鐗堟湰锛屾澶勪笉鍐嶉噸澶嶅畾涔?        // --- 寮圭獥閫昏緫 ---
+        async function openSettings() {
+            ui.settingsModal.classList.remove('hidden');
+            ui.profileMenu.classList.add('hidden');
+            await loadPrompts();
+            if (!document.getElementById('tab-api').classList.contains('hidden')) {
+                showApiListView();
+            }
+        }
+        function closeSettings() { ui.settingsModal.classList.add('hidden'); }
+        
+        function openGithubModal() {
+            closeAllMenus();
+            ui.githubModal.classList.remove('hidden');
+        }
+        function closeGithubModal() { 
+            ui.githubModal.classList.add('hidden'); 
+            document.getElementById('github-url-input').value = '';
+        }
+
+        // --- 甯姪寮圭獥閫昏緫 ---
+        function openHelpModal() {
+            closeAllMenus();
+            ui.helpModal.classList.remove('hidden');
+        }
+        function closeHelpModal() {
+            ui.helpModal.classList.add('hidden');
+        }
+
+        // parseGithubRepo 鐢?app.js 鎻愪緵鐪熷疄 API 鐗堟湰
+        
+        function switchTab(tab) {
+            const tabs = ['personal', 'api', 'storage'];
+            tabs.forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}-btn`).classList.remove('bg-white/10', 'text-white');
+            });
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}-btn`).classList.add('bg-white/10', 'text-white');
+            
+            if (tab === 'api') showApiListView();
+        }
+
+        function switchPromptSubTab(type) {
+            const btnGlobal = document.getElementById('subtab-global-btn');
+            const btnSpecific = document.getElementById('subtab-specific-btn');
+            const secGlobal = document.getElementById('prompt-section-global');
+            const secSpecific = document.getElementById('prompt-section-specific');
+
+            if (type === 'global') {
+                secGlobal.classList.remove('hidden');
+                secSpecific.classList.add('hidden');
+                btnGlobal.className = "flex-1 py-1.5 text-sm font-medium rounded-lg bg-[#2f2f2f] text-white shadow-sm transition-all";
+                btnSpecific.className = "flex-1 py-1.5 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-300 transition-all";
+            } else {
+                secGlobal.classList.add('hidden');
+                secSpecific.classList.remove('hidden');
+                btnSpecific.className = "flex-1 py-1.5 text-sm font-medium rounded-lg bg-[#2f2f2f] text-white shadow-sm transition-all";
+                btnGlobal.className = "flex-1 py-1.5 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-300 transition-all";
+            }
+        }
+
+        function toggleSidebar() {
+            ui.sidebar.classList.toggle('sidebar-collapsed');
+            ui.sidebarOpenBtn.classList.toggle('hidden');
+        }
+
+        function toggleProfileMenu(e) {
+            e.stopPropagation();
+            const isHidden = ui.profileMenu.classList.contains('hidden');
+            closeAllMenus();
+            if (isHidden) ui.profileMenu.classList.remove('hidden');
+        }
+
+        function toggleAttachMenu(e) {
+            e.stopPropagation();
+            const isHidden = ui.attachMenu.classList.contains('hidden');
+            closeAllMenus();
+            if (isHidden) ui.attachMenu.classList.remove('hidden');
+        }
+
+        // --- 鏂板: 妯″瀷鑿滃崟浜や簰閫昏緫 ---
+        function toggleModelMenu(e) {
+            e.stopPropagation();
+            const isHidden = ui.modelMenu.classList.contains('hidden');
+            closeAllMenus();
+            if (isHidden) {
+                renderModelMenu();
+                ui.modelMenu.classList.remove('hidden');
+            }
+        }
+
+        function renderModelMenu() {
+            ui.modelMenu.innerHTML = '';
+            
+            // Render all selectable models.
+            apiModels.forEach(m => {
+                const btn = document.createElement('button');
+                btn.className = "w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/5 rounded-lg text-sm text-gray-300 transition-colors";
+                btn.onclick = () => { selectModelFromMenu(m.id); };
+                btn.innerHTML = `
+                    <span class="truncate">${escapeHtml(m.name)}</span>
+                    ${m.active ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>' : ''}
+                `;
+                ui.modelMenu.appendChild(btn);
+            });
+
+            // Show a hint when only one model is available.
+            if (apiModels.length <= 1) {
+                const div = document.createElement('div');
+                div.className = "px-3 py-2 text-xs text-gray-500 text-center mt-1 border-t border-white/5 cursor-default";
+                div.textContent = "暂无更多模型";
+                ui.modelMenu.appendChild(div);
+            }
+        }
+
+        function selectModelFromMenu(id) {
+            setActiveModel(id);
+            closeAllMenus();
+        }
+
+        // --- 缁熶竴鍏抽棴鎵€鏈夋偓娴彍鍗?---
+        function closeAllMenus() { 
+            if (ui.profileMenu) ui.profileMenu.classList.add('hidden'); 
+            if (ui.attachMenu) ui.attachMenu.classList.add('hidden');
+            if (ui.modelMenu) ui.modelMenu.classList.add('hidden');
+        }
+
+        // --- 鑱婂ぉ涓庢秷鎭鐞?---
+        ui.userInput.addEventListener('input', () => {
+            if (typeof refreshComposerState === 'function') {
+                refreshComposerState();
+            } else {
+                ui.sendBtn.disabled = !ui.userInput.value.trim() || isTyping;
+            }
+        });
+
+        ui.userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+            }
+        });
+
+        // handleSend 鐢?app.js 鎻愪緵鐪熷疄 API 鐗堟湰
+
+        function addMessage(role, content, isLoading = false, options = {}) {
+            const id = 'msg-' + Date.now();
+            const avatarId = 'avatar-' + Date.now();
+            const msgContainer = document.createElement('div');
+            msgContainer.className = `message-group flex flex-col ${role === 'user' ? 'items-end' : 'items-start'} w-full group mb-8`;
+            msgContainer.dataset.role = role;
+            if (options.messageId) {
+                msgContainer.dataset.messageId = options.messageId;
+            }
+            
+            const innerHTML = role === 'user' 
+                ? `
+                    <div class="flex flex-col items-end gap-1 max-w-[90%]">
+                        <div class="message-content bg-[#2f2f2f] px-4 py-2.5 rounded-2xl message-bubble text-white shadow-sm" data-raw-content="${encodeURIComponent(content)}">
+                            ${escapeHtml(content)}
+                        </div>
+                        <div class="message-action-bar flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onclick="copySingleMessage(this)" class="action-btn p-1.5 text-gray-500 hover:text-white transition-all" title="复制消息">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                            <button onclick="editSingleMessage(this)" class="action-btn p-1.5 text-gray-500 hover:text-white transition-all" title="编辑消息">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                `
+                : `
+                    <div class="flex gap-4 w-full max-w-[90%] items-start">
+                        <div id="${avatarId}" class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center shrink-0 bg-[#212121] ${isLoading ? 'avatar-loading' : ''}">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="10" cy="10" r="8" stroke="white" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+                        <div class="flex flex-col gap-1 flex-1 min-w-0">
+                            <div id="${id}" class="message-content py-1 text-gray-200 break-words markdown-body" data-raw-content="${encodeURIComponent(content)}"></div>
+                            <div class="message-action-bar flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onclick="copySingleMessage(this)" class="action-btn p-1.5 text-gray-500 hover:text-white transition-all" title="澶嶅埗娑堟伅">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                                <button onclick="retrySingleMessage(this)" class="action-btn p-1.5 text-gray-500 hover:text-white transition-all" title="閲嶈瘯">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v6h6"/><path d="M21 12A9 9 0 0 0 6 5.3L3 8"/><path d="M21 22v-6h-6"/><path d="M3 12a9 9 0 0 0 15 6.7L21 16"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            
+            msgContainer.innerHTML = innerHTML;
+            ui.messagesList.appendChild(msgContainer);
+            if (role === 'assistant') {
+                renderAssistantMarkdown(document.getElementById(id), content);
+            }
+            scrollToBottom();
+            return { msgId: id, avatarId: avatarId, group: msgContainer };
+        }
+
+        function copySingleMessage(btn) {
+            const msgGroup = btn.closest('.message-group');
+            const contentDiv = msgGroup.querySelector('.message-content');
+            if (!contentDiv) return;
+            
+            let textToCopy = msgGroup.dataset.rawContent; // First rely on backend stream raw content
+            if (!textToCopy) {
+                // Fallback to our inline encoded content created during addMessage
+                let encodedRaw = contentDiv.getAttribute('data-raw-content');
+                if (encodedRaw && encodedRaw !== '%') { // % is empty string encode
+                    textToCopy = decodeURIComponent(encodedRaw);
+                } else {
+                    textToCopy = contentDiv.innerText;
+                }
+            }
+
+            copyTextValue(textToCopy).then(() => {
+                showCopiedStatus(btn);
+            }).catch(() => {
+                console.error('Copy message failed');
+            });
+        }
+        
+        function fallbackCopy(text, btn) {
+            if (fallbackCopyText(text)) {
+                if (btn) {
+                    showCopiedStatus(btn);
+                }
+            } else {
+                console.error('Fallback copy command failed natively');
+            }
+        }
+        
+        function showCopiedStatus(btn) {
+            const oldHtml = btn.innerHTML;
+            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+            setTimeout(() => {
+                btn.innerHTML = oldHtml;
+            }, 2000);
+        }
+
+        function simulateTyping(id, text, avatarId) {
+            const element = document.getElementById(id);
+            element.classList.add('typing');
+            let i = 0;
+            let currentText = "";
+            const interval = setInterval(() => {
+                if (text && i < text.length) currentText += text.charAt(i);
+                renderAssistantMarkdown(element, currentText);
+                i++;
+                scrollToBottom();
+                if (i >= text.length) { 
+                    clearInterval(interval); 
+                    element.classList.remove('typing'); 
+                    isTyping = false; 
+                    
+                    // Remove the loading pulse once the assistant reply has finished.
+                    if (avatarId) {
+                        const avatarEl = document.getElementById(avatarId);
+                        if (avatarEl) avatarEl.classList.remove('avatar-loading');
+                    }
+                }
+            }, 30);
+        }
+
+        // --- 渚ц竟鏍忓巻鍙茶褰曢€昏緫 ---
+        function handleHistorySearch(q) {
+            const query = String(q || '').toLowerCase();
+            if (currentChatMode === 'agent') {
+                renderAgentProjectTree();
+                return;
+            }
+
+            document.querySelectorAll('.history-entry').forEach(el => {
+                el.classList.toggle('hidden', !el.textContent.toLowerCase().includes(query));
+            });
+        }
+
+        function updateHistory(text) {
+            const title = text.length > 20 ? text.substring(0, 20) + '...' : text;
+            if (currentChatMode === 'ask') {
+                renderSessionHistory([{ id: '__pending__', title }]);
+            }
+        }
+
+        function confirmDelete(btn, e) { e.stopPropagation(); itemPendingDelete = btn.closest('.history-entry'); ui.deleteModal.classList.remove('hidden'); }
+        function closeModal() { ui.deleteModal.classList.add('hidden'); itemPendingDelete = null; }
+        
+        async function executeDelete() { 
+            if (!itemPendingDelete) {
+                return;
+            }
+
+            const sessionId = itemPendingDelete.dataset.sessionId;
+            closeModal();
+
+            if (!sessionId || sessionId === '__pending__') {
+                return;
+            }
+
+            await deleteSession(sessionId);
+        }
+
+        // resetChat 鐢?app.js 鎻愪緵鐪熷疄 API 鐗堟湰锛堝惈 currentSessionId 閲嶇疆锛?
+        function quickMessage(text) { ui.userInput.value = text; handleSend(); }
+        function scrollToBottom() { ui.scrollContainer.scrollTo({ top: ui.scrollContainer.scrollHeight, behavior: 'smooth' }); }
+        function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+
+        // --- API 缂栬緫瑙嗗浘锛氭姌鍙犻潰鏉夸笌瑙ｆ瀽 ---
+        function toggleApiParser() {
+            const container = document.getElementById('api-parser-container');
+            const chevron = document.getElementById('parser-chevron');
+            const isHidden = container.classList.contains('hidden');
+            container.classList.toggle('hidden');
+            chevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+
+        // parseAPICode 鐢?app.js 鎻愪緵鐪熷疄 API 鐗堟湰
+
+        // testConnection 鐢?app.js 鎻愪緵鐪熷疄 API 鐗堟湰
+        
+        // --- 鍒濆鍖?---
+        // 浣跨敤 addEventListener 閬垮厤涓?app.js 鐨?load 浜嬩欢鍐茬獊
+        // 妯″瀷鍒楄〃鐢?app.js 鐨?loadModels() 浠庡悗绔姞杞藉苟娓叉煋
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPrompts();
+            // 纭繚鍒濆杩涘叆API鐣岄潰鏃舵槸鍒楄〃椤?            document.getElementById('api-list-view').classList.remove('hidden');
+            document.getElementById('api-edit-view').classList.add('hidden');
+            loadAgentProject();
+            if (typeof initializeChatMode === 'function') {
+                initializeChatMode();
+            } else {
+                loadSessionHistory();
+            }
+        });
+    </script>
+    <script src="./ChatAI Interactive UI_files/app.js"></script>
+
+</body></html>

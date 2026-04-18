@@ -1,0 +1,10 @@
+PID: 22052
+CWD: E:\ChatAI-Interactive-main
+Command: cmd /c npm run build > .agent-terminal\build-capture.log 2>&1
+Running: false
+Exit Code: 1
+Last Updated: 2026-04-13T13:31:06.029Z
+--- STDOUT ---
+(empty)
+--- STDERR ---
+(empty)
